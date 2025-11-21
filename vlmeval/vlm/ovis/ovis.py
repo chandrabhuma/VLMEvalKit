@@ -329,6 +329,7 @@ class Ovis2(BaseModel):
             self.model_path,
             torch_dtype=self.dtype,
             multimodal_max_length=32768,
+            attn_implementation="sdpa",
             trust_remote_code=True
         )
         self.size = self.SIZE_DICT[
