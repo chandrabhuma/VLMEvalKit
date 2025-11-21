@@ -116,7 +116,7 @@ class Phi3_5Vision(BaseModel):
 
         model = AutoModelForCausalLM.from_pretrained(
             model_path, device_map='cuda', trust_remote_code=True, torch_dtype='auto',
-            _attn_implementation='flash_attention_2').eval()
+            _attn_implementation='sdpa').eval()
 
         # for best performance, use num_crops=4 for multi-frame, num_crops=16 for single-frame.
         processor = AutoProcessor.from_pretrained(model_path, trust_remote_code=True, num_crops=4)
