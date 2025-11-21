@@ -1750,7 +1750,7 @@ ola_series = {
 }
 
 xvl_series = {
-    "X-VL-4B": partial(X_VL_HF, model_path="YannQi/X-VL-4B", temperature=0, retry=10),
+    "X-VL-4B": partial(X_VL_HF, model_path="YannQi/R-4B", temperature=0, retry=10),
 }
 
 ross_series = {
