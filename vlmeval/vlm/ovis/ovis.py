@@ -325,11 +325,19 @@ class Ovis2(BaseModel):
         self.model_path = model_path
         self.device = torch.cuda.current_device()
         self.dtype = torch.bfloat16
+        # Force SDPA globally
+        torch.backends.cuda.sdp_kernel(enable_flash=False, enable_math=True, enable_mem_efficient=False)
+
+        # Load config
+        config = AutoConfig.from_pretrained("AIDC-AI/Ovis2-8B", trust_remote_code=True)
+
+        # Override attention implementation
+        config.llm_attn_implementation = "sdpa"  # or "eager" if you prefer
         self.model = AutoModelForCausalLM.from_pretrained(
             self.model_path,
             torch_dtype=self.dtype,
             multimodal_max_length=32768,
-            attn_implementation="eager",
+            config=config,
             trust_remote_code=True
         )
         self.size = self.SIZE_DICT[
