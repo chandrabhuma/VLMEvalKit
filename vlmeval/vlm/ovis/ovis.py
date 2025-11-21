@@ -319,7 +319,7 @@ class Ovis2(BaseModel):
         (64, 5120): '34B'
     }
 
-    def __init__(self, model_path='AIDC-AI/Ovis2-8B', **kwargs):
+    def __init__(self, model_path='AIDC-AI/Ovis2-1B', **kwargs):
         assert model_path is not None
         # Recommend to install `python=3.10`, `transformers==4.46.2`, `torch==2.4.0`, and `numpy==1.25.0`
         self.model_path = model_path
