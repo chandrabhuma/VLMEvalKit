@@ -14,7 +14,7 @@ class LFM2VL(BaseModel):
         self.model = (
             AutoModelForImageTextToText.from_pretrained(
                 model_path,
-                attn_implementation="flash_attention_2",
+                attn_implementation="sdpa",
                 torch_dtype=torch.bfloat16,
             )
             .cuda()
