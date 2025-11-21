@@ -326,7 +326,7 @@ class Ovis2(BaseModel):
         self.device = torch.cuda.current_device()
         self.dtype = torch.bfloat16
         # Force SDPA globally
-        torch.backends.cuda.sdp_kernel(enable_flash=False, enable_math=True, enable_mem_efficient=False)
+        torch.backends.cuda.sdp_kernel(enable_flash=False, enable_math=False,  enable_mem_efficient=False)
 
         # Load config
         config = AutoConfig.from_pretrained("AIDC-AI/Ovis2-8B", trust_remote_code=True)
