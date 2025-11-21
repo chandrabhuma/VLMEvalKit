@@ -13,7 +13,7 @@ class X_VL_HF(BaseModel):
     DEFAULT_IMAGE_TOKEN = "<image>"
     IMAGE_TOKEN_INDEX = -200
 
-    def __init__(self, model_path="YannQi/X-VL-4B", **kwargs):
+    def __init__(self, model_path="YannQi/R-4B", **kwargs):
         from transformers import AutoProcessor, AutoModel
         assert model_path is not None, "Model path must be provided."
         self.model = AutoModel.from_pretrained(
