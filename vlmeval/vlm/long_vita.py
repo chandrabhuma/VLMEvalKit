@@ -683,7 +683,7 @@ class LongVITAWrapper(BaseModel):
             trust_remote_code=True,
             device_map="cuda",
             torch_dtype=torch.bfloat16,
-            attn_implementation="flash_attention_2",
+            attn_implementation="sdpa",
         ).eval()
 
         model.generation_config = GenerationConfig.from_pretrained(model_path, trust_remote_code=True)
