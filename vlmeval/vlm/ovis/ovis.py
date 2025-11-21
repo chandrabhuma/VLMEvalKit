@@ -1,5 +1,5 @@
 import torch
-from transformers import AutoModelForCausalLM
+from transformers import AutoConfig, AutoModelForCausalLM
 
 from ..base import BaseModel
 from ...dataset import DATASET_TYPE, DATASET_MODALITY
