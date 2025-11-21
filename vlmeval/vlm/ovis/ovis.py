@@ -332,7 +332,7 @@ class Ovis2(BaseModel):
         config = AutoConfig.from_pretrained("AIDC-AI/Ovis2-8B", trust_remote_code=True)
 
         # Override attention implementation
-        config.llm_attn_implementation = "sdpa"  # or "eager" if you prefer
+        config.llm_attn_implementation = "eager"  # or "eager" if you prefer
         self.model = AutoModelForCausalLM.from_pretrained(
             self.model_path,
             torch_dtype=self.dtype,
