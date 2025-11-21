@@ -19,7 +19,7 @@ class Phi4Multimodal(BaseModel):
 
         model = AutoModelForCausalLM.from_pretrained(
             model_path, device_map='cuda', trust_remote_code=True,
-            torch_dtype='auto',attn_implementation='flash_attention_2'
+            torch_dtype='auto',attn_implementation='sdpa'
         ).eval()
         processor = AutoProcessor.from_pretrained(model_path, trust_remote_code=True)
         generation_config = GenerationConfig.from_pretrained(model_path)
