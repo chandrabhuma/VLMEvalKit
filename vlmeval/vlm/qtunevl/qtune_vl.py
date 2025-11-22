@@ -202,7 +202,7 @@ class QTuneVL(QTuneVLPromptMixin, BaseModel):
         self.processor = AutoProcessor.from_pretrained(model_path)
 
         self.model = Qwen2_5_VLForConditionalGeneration.from_pretrained(
-            model_path, torch_dtype='auto', device_map="auto", attn_implementation='flash_attention_2'
+            model_path, torch_dtype='auto', device_map="auto", attn_implementation='sdpa'
         )
         self.model.eval().to('cuda')
 
