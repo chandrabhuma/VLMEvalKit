@@ -98,7 +98,7 @@ class Gemma3(BaseModel):
             # export VLLM_WORKER_MULTIPROC_METHOD=spawn
         else:
             self.model = Gemma3ForConditionalGeneration.from_pretrained(
-                model_path, device_map="cuda", attn_implementation="sdpa", torch_dtype=torch.bfloat16
+                model_path, device_map="cuda", attn_implementation="sdpa", torch_dtype=torch.float16
             ).eval()
             self.device = self.model.device
 
