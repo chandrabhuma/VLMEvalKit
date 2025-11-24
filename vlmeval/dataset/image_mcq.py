@@ -716,7 +716,7 @@ class GMAIMMBenchDataset(ImageMCQDataset):
         'GMAI_mm_bench_TEST_part_7': 'https://huggingface.co/datasets/OpenGVLab/GMAI-MMBench/blob/main/GMAI_mm_bench_TEST_part_7.tsv',  # noqa: E501
         'GMAI_mm_bench_TEST_part_8': 'https://huggingface.co/datasets/OpenGVLab/GMAI-MMBench/blob/main/GMAI_mm_bench_TEST_part_8.tsv',  # noqa: E501
         'GMAI_mm_bench_TEST_part_9': 'https://huggingface.co/datasets/OpenGVLab/GMAI-MMBench/blob/main/GMAI_mm_bench_TEST_part_9.tsv',  # noqa: E501
-        'GMAI_mm_bench_TEST_part_10': https://huggingface.co/datasets/OpenGVLab/GMAI-MMBench/blob/main/GMAI_mm_bench_TEST_part_10.tsv',  # noqa: E501
+        'GMAI_mm_bench_TEST_part_10': 'https://huggingface.co/datasets/OpenGVLab/GMAI-MMBench/blob/main/GMAI_mm_bench_TEST_part_10.tsv',  # noqa: E501
         'GMAI_mm_bench_TEST_part_11': 'https://huggingface.co/datasets/OpenGVLab/GMAI-MMBench/blob/main/GMAI_mm_bench_TEST_part_11.tsv',  # noqa: E501
     }
 
