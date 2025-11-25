@@ -73,7 +73,7 @@ class KeyeChat(Qwen2VLPromptMixin, BaseModel):
                 AutoModel.from_pretrained(
                     model_path,
                     torch_dtype=torch.bfloat16,
-                    _attn_implementation="flash_attention_2",
+                    _attn_implementation="sdpa",
                     trust_remote_code=True,
                     device_map="cuda",
                 )
