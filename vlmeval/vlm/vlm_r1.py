@@ -77,7 +77,7 @@ class VLMR1Chat(Qwen2VLPromptMixin, BaseModel):
             model_path,
             torch_dtype="auto",
             device_map="cuda",
-            attn_implementation="flash_attention_2",
+            attn_implementation="sdpa,
         )
         self.model.eval()
         torch.cuda.empty_cache()
