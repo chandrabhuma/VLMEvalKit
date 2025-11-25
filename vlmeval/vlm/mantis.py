@@ -50,7 +50,7 @@ class Mantis(BaseModel):
         except ImportError:
             best_fit_attn_implementation = 'eager'
         self.model_path = model_path
-        attn_implementation = best_fit_attn_implementation
+        attn_implementation = 'sdpa'
         self._is_idefics = 'idefics' in model_path.lower()
         # Here load the "non-idefics" Mantis model.
         if not self._is_idefics:
