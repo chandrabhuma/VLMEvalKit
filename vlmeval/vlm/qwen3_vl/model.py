@@ -148,11 +148,11 @@ class Qwen3VLChat(Qwen3VLPromptMixin, BaseModel):
         else:
             if listinstr(['omni'], model_path.lower()):
                 self.model = Qwen3OmniMoeForConditionalGeneration.from_pretrained(
-                    model_path, dtype='auto', device_map='auto', attn_implementation='flash_attention_2'
+                    model_path, dtype='auto', device_map='auto', attn_implementation='sdpa'
                 )
             else:
                 self.model = AutoModelForImageTextToText.from_pretrained(
-                    model_path, torch_dtype='auto', device_map='auto', attn_implementation='flash_attention_2'
+                    model_path, torch_dtype='auto', device_map='auto', attn_implementation='sdpa'
                 )
             self.model.eval()
 
