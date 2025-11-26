@@ -71,7 +71,7 @@ class TreeVGR(Qwen2VLPromptMixin, BaseModel):
         self.model = MODEL_CLS.from_pretrained(
             model_path,
             torch_dtype="auto",
-            device_map="cuda",
+            device_map="auto",
             attn_implementation="sdpa",
         )
         self.model.eval()
