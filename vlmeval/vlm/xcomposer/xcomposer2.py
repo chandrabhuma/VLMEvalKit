@@ -86,7 +86,7 @@ class XComposer2(BaseModel):
         assert model_path is not None
         self.model_path = model_path
 
-        model = AutoModel.from_pretrained(self.model_path, device_map='cpu', trust_remote_code=True).cuda().eval()
+        model = AutoModel.from_pretrained(self.model_path, device_map='auto', trust_remote_code=True).cuda().eval()
         model.half()
         tokenizer = AutoTokenizer.from_pretrained(self.model_path, trust_remote_code=True)
         model.tokenizer = tokenizer
