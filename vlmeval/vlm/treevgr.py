@@ -13,7 +13,7 @@ from ..smp import get_gpu_memory
 from ..dataset import DATASET_TYPE
 
 
-SYSTEM_PROMPT = """A conversation between user and assistant. The user asks a question, and the Assistant solves it. The assistant MUST first think about the reasoning process in the mind and then provide the user with the answer. The reasoning process and answer are enclosed within <think> </think> and <answer> </answer> tags, respectively. When referring to particular objects in the reasoning process, the assistant MUST localize the object with bounding box coordinates between <box> and </box>. You MUST strictly follow the format."""   # noqa: E501
+SYSTEM_PROMPT = "Based on the image characteristics answer to the question. "   # noqa: E501
 
 
 class TreeVGR(Qwen2VLPromptMixin, BaseModel):
