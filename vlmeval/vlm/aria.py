@@ -27,7 +27,7 @@ class Aria(BaseModel):
         self.tokenizer = tokenizer
         self.model = AutoModelForCausalLM.from_pretrained(
             model_path,
-            device_map='cuda',
+            device_map='auto',
             torch_dtype=torch.bfloat16,
             trust_remote_code=True
         ).eval()
