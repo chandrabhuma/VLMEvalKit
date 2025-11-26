@@ -19,9 +19,9 @@ class FlashVL(BaseModel):
         self.model = AutoModel.from_pretrained(model_path,
                                                torch_dtype=torch.bfloat16,
                                                trust_remote_code=True,
-                                               device_map='cuda')
+                                               device_map='auto')
         self.model.tokenizer = AutoTokenizer.from_pretrained(model_path,
-                                                             device_map='cuda')
+                                                             device_map='auto')
         self.model.im_trans = CLIPImageProcessor.from_pretrained(
             model_path, trust_remote_code=True)
         self.INTERLEAVE = False
