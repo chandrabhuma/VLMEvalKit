@@ -5,26 +5,66 @@ from PIL import Image
 from .base import BaseModel
 from ..dataset import DATASET_TYPE
 from ..smp import listinstr, cn_string
-from transformers import AutoModel, AutoTokenizer, CLIPImageProcessor
+from transformers import AutoConfig, AutoModel, AutoTokenizer, CLIPImageProcessor
+
 
 
 class FlashVL(BaseModel):
-
     INSTALL_REQ = False
     INTERLEAVE = True
 
     def __init__(self, model_path, **kwargs):
-        assert model_path is not None
+        assert model_path is not None, "Please provide a valid model_path"
         self.model_path = model_path
-        self.model = AutoModel.from_pretrained(model_path,
-                                               torch_dtype=torch.bfloat16,
-                                               trust_remote_code=True,
-                                               device_map='auto')
-        self.model.tokenizer = AutoTokenizer.from_pretrained(model_path,
-                                                             device_map='auto')
+
+        # -------------------------
+        # Load configs for vision and LLM
+        # -------------------------
+        try:
+            vision_config = AutoConfig.from_pretrained(model_path, trust_remote_code=True)
+            llm_config = AutoConfig.from_pretrained(model_path, trust_remote_code=True)
+        except Exception as e:
+            raise ValueError(f"Failed to load configs from {model_path}: {e}")
+
+        # -------------------------
+        # Load model with device_map for multi-GPU
+        # -------------------------
+        self.model = AutoModel.from_pretrained(
+            model_path,
+            torch_dtype=torch.bfloat16,
+            trust_remote_code=True,
+            device_map="auto",
+            vision_config=vision_config,
+            llm_config=llm_config,
+        )
+
+        # -------------------------
+        # Tokenizer
+        # -------------------------
+        self.model.tokenizer = AutoTokenizer.from_pretrained(
+            model_path,
+            trust_remote_code=True,
+            device_map="auto"
+        )
+
+        # -------------------------
+        # Image processor
+        # -------------------------
         self.model.im_trans = CLIPImageProcessor.from_pretrained(
-            model_path, trust_remote_code=True)
+            model_path,
+            trust_remote_code=True
+        )
+
+        # -------------------------
+        # Set interleave flag
+        # -------------------------
         self.INTERLEAVE = False
+
+        # -------------------------
+        # Save kwargs
+        # -------------------------
+        self.kwargs = kwargs
+
 
     def build_history(self, message):
 
