@@ -52,7 +52,8 @@ class Valley2Chat(BaseModel):
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
         logging.info(f"Start loading valley model from {model_path}")
-        self.model = AutoModel.from_pretrained(model_path, torch_dtype=self.torch_dtype, trust_remote_code=True)
+        self.model = AutoModel.from_pretrained(model_path, torch_dtype=self.torch_dtype, trust_remote_code=True, attn_implementation="sdpa")
+
         self.model = self.model.to(self.device).half()
         self.processor = AutoProcessor.from_pretrained(
             model_path,
