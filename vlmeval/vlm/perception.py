@@ -8,8 +8,7 @@ from ..dataset import DATASET_TYPE, DATASET_MODALITY
 
 
 from transformers import AutoProcessor, AutoModelForImageTextToText
-from vlmeval.vlm.base import BaseModel
-from PIL import Image
+
 
 class PerceptionLM(BaseModel):
 
