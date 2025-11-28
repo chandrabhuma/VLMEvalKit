@@ -1404,6 +1404,10 @@ phi4_series = {
     'Phi-4-Vision': partial(Phi4Multimodal, model_path='microsoft/Phi-4-multimodal-instruct'),
 }
 
+perception_series={
+    'Perception-LM-1B': partial(perception, model_path='PIA-SPACE-LAB/Perception-LM-1B'),
+}
+
 xgen_mm_series = {
     "xgen-mm-phi3-interleave-r-v1.5": partial(
         XGenMM, model_path="Salesforce/xgen-mm-phi3-mini-instruct-interleave-r-v1.5"
