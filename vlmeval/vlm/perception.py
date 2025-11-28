@@ -7,51 +7,56 @@ from ..smp import *
 from ..dataset import DATASET_TYPE, DATASET_MODALITY
 
 
-class Perception(BaseModel):
-    INSTALL_REQ = True
-    INTERLEAVE = True
-    DEFAULT_IMAGE_TOKEN = "<image>"
-    IMAGE_TOKEN_INDEX = -200
+from transformers import AutoProcessor, AutoModelForImageTextToText
+from vlmeval.vlm.base import BaseModel
+from PIL import Image
 
-    def __init__(self, model_path="PIA-SPACE-LAB/Perception-LM-1B", **kwargs):
-        from transformers import AutoProcessor, AutoModel
-        assert model_path is not None, "Model path must be provided."
+class PerceptionLM(BaseModel):
+
+    INSTALL_REQ = False
+    INTERLEAVE = True  # supports images anywhere
+
+    def __init__(self, model_path="facebook/Perception-LM-1B", max_new_tokens=512, **kwargs):
+        super().__init__()
+        self.processor = AutoProcessor.from_pretrained(model_path, use_fast=True)
         self.model = AutoModelForImageTextToText.from_pretrained(
             model_path,
-            torch_dtype=torch.float16,
             trust_remote_code=True,
-        ).to('cuda', torch.float16)
-        self.processor = AutoProcessor.from_pretrained(model_path, trust_remote_code=True)
+        ).to("cuda")
+        self.max_new_tokens = max_new_tokens
 
-        self.model_path = model_path
+    def generate_inner(self, message, dataset=None):
+        images = []
+        contents = []
 
-    def generate_inner_image(self, message, dataset=None):
-        content, images = "", []
-        image_sizes = []
-
+        # Convert VLMEvalKit messages → Perception-LM format
         for msg in message:
             if msg["type"] == "text":
-                content += msg["value"]
+                contents.append({"type": "text", "text": msg["value"]})
             elif msg["type"] == "image":
-                img = Image.open(msg["value"]).convert("RGB")
-                images.append(img)
-                image_sizes.append(img.size)
-                content += self.DEFAULT_IMAGE_TOKEN + "\n"
+                contents.append({"type": "image", "url": msg["value"]})
 
-        conversation = [
-            {
-                "role": "user",
-                "content": [
-                    {"type": "text", "text": content},
-                ],
-            }
-        ]
-        prompt = self.processor.apply_chat_template(conversation, add_generation_prompt=True)
-        inputs = self.processor(images=images, text=prompt, return_tensors="pt").to('cuda', torch.float16)
+        conversation = [{
+            "role": "user",
+            "content": contents,
+        }]
 
-        output = self.model.generate(**inputs, max_new_tokens=16384, use_cache=True)
-        answer = self.processor.decode(output[0][inputs.input_ids.shape[1]:], skip_special_tokens=True)
-        answer = answer.split('</think>')[-1].strip()
+        # Tokenize
+        inputs = self.processor.apply_chat_template(
+            [conversation],
+            add_generation_prompt=True,
+            tokenize=True,
+            return_dict=True,
+            return_tensors="pt",
+        ).to(self.model.device)
+
+        # Generate
+        generate_ids = self.model.generate(**inputs, max_new_tokens=self.max_new_tokens)
+        input_length = inputs["input_ids"].shape[1]
+        outputs = generate_ids[:, input_length:]
+
+        # Decode
+        answer = self.processor.batch_decode(outputs, skip_special_tokens=True)[0]
+        if "</think>" in answer:
+            answer = answer.split("</think>")[-1].strip()
         return answer
-
-    
