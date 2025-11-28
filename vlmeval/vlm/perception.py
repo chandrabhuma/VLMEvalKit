@@ -21,8 +21,8 @@ class PerceptionLM(BaseModel):
         self.model = AutoModelForImageTextToText.from_pretrained(
             model_path,
             device_map="auto",
-            attn_implementation="sdpa"
-            trust_remote_code=True,
+            attn_implementation="sdpa",
+            trust_remote_code=True
         )
         self.max_new_tokens = max_new_tokens
 
