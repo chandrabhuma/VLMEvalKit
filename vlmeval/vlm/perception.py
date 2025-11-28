@@ -15,7 +15,7 @@ class PerceptionLM(BaseModel):
     INSTALL_REQ = False
     INTERLEAVE = True  # supports images anywhere
 
-    def __init__(self, model_path="facebook/Perception-LM-1B", max_new_tokens=512, **kwargs):
+    def __init__(self, model_path="PIA-SPACE-LAB/Perception-LM-1B", max_new_tokens=512, **kwargs):
         super().__init__()
         self.processor = AutoProcessor.from_pretrained(model_path, use_fast=True)
         self.model = AutoModelForImageTextToText.from_pretrained(
