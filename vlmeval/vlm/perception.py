@@ -20,8 +20,10 @@ class PerceptionLM(BaseModel):
         self.processor = AutoProcessor.from_pretrained(model_path, use_fast=True)
         self.model = AutoModelForImageTextToText.from_pretrained(
             model_path,
+            device_map="auto",
+            attn_implementation="sdpa"
             trust_remote_code=True,
-        ).to("cuda")
+        )
         self.max_new_tokens = max_new_tokens
 
     def generate_inner(self, message, dataset=None):
