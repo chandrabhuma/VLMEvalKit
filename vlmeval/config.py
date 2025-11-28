@@ -1405,7 +1405,7 @@ phi4_series = {
 }
 
 perception_series={
-    'Perception-LM-1B': partial(perception, model_path='PIA-SPACE-LAB/Perception-LM-1B'),
+    'Perception-LM-1B': partial(PerceptionLM, model_path='PIA-SPACE-LAB/Perception-LM-1B'),
 }
 
 xgen_mm_series = {
