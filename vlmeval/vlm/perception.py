@@ -32,7 +32,36 @@ class PerceptionLM(BaseModel):
         self.max_new_tokens = max_new_tokens
 
     # override VLMEvalKit's heavy prompt version
-    def generate_inner(self, image, text, dataset=None):
-        inputs = self.processor(images=image, text=text, return_tensors="pt").to(self.model.device)
-        output = self.model.generate(**inputs, max_new_tokens=self.max_new_tokens)
-        return self.processor.decode(output[0], skip_special_tokens=True)
+    def generate_inner(self, msgs, dataset=None):
+        images = []
+        text_parts = []
+    
+        # 1. Parse VLMEvalKit message list
+        for msg in msgs:
+            if msg["type"] == "image":
+                img = msg["value"]
+                images.append(img)
+            elif msg["type"] == "text":
+                text_parts.append(msg["value"])
+        
+        # 2. Combine all text into a single prompt
+        prompt = " ".join(text_parts).strip()
+    
+        # 3. Send to Perception-LM processor
+        inputs = self.processor(
+            images=images,
+            text=prompt,
+            return_tensors="pt"
+        ).to(self.model.device)
+    
+        # 4. Generate output
+        output = self.model.generate(
+            **inputs,
+            max_new_tokens=self.max_new_tokens
+        )
+    
+        # 5. Decode
+        return self.processor.decode(
+            output[0],
+            skip_special_tokens=True
+        )
