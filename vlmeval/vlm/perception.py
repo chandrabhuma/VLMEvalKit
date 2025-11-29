@@ -26,7 +26,7 @@ class PerceptionLM(BaseModel):
             device_map="auto",
             torch_dtype=torch.float16,
             trust_remote_code=True,
-            attn_implementation="sdpa"   # or eager
+            attn_implementation="eager"   # or eager
         )
 
         self.max_new_tokens = max_new_tokens
