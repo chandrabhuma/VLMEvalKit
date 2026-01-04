@@ -94,7 +94,7 @@ from .matbench import MATBench
 
 from .reasonmap_plus import ReasonMap_Plus
 from .gsm8k_v import GSM8KVDataset
-
+from .traffic_vqa_test import traffic_vqa_test
 
 class ConcatDataset(ImageBaseDataset):
     # This dataset takes multiple dataset names as input and aggregate them into a single dataset.
