@@ -243,7 +243,7 @@ TEXT_DATASET = [
 ]
 
 CUSTOM_DATASET = [
-    CustomMCQDataset, CustomVQADataset, CustomTextMCQDataset
+    CustomMCQDataset, traffic_vqa_test, CustomTextMCQDataset
 ]
 
 DATASET_COLLECTION = [ConcatDataset, ConcatVideoDataset]
