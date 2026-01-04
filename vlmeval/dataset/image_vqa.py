@@ -3726,3 +3726,53 @@ class MathCanvas(ImageBaseDataset):
             json.dump(summary_dict, f, ensure_ascii=False, indent=4)
 
         return summary_dict
+class traffic_vqa_test(ImageBaseDataset):
+    TYPE = "VQA"
+    DATASET_NAME = "traffic_vqa_test"
+
+    def __init__(self, data_file=None, **kwargs):
+        if data_file is None:
+            # Download from Hugging Face and place in LMUDataRoot
+            self.data_file = hf_hub_download(
+                repo_id="chandrabhuma/traffic_vqa_test_tsv",
+                filename="traffic_vqa_test.tsv",
+                repo_type="dataset",
+                local_dir=LMUDataRoot(),
+            )
+        else:
+            self.data_file = data_file
+
+        if not osp.exists(self.data_file):
+            raise FileNotFoundError(f"Data file {self.data_file} not found.")
+
+        self.data = pd.read_csv(self.data_file, sep="\t")
+
+    def build_prompt(self, line):
+        msgs = []
+
+        if "image" in line:
+            image_url = line["image"]
+            if isinstance(image_url, str) and len(image_url) > 0:
+                msgs.append(dict(type="image", value=image_url))
+
+        if "question" in line:
+            question = line["question"]
+            if isinstance(question, str) and len(question) > 0:
+                msgs.append(dict(type="text", value=question))
+
+        return msgs
+
+    def evaluate(self, eval_file, **judge_kwargs):
+        data = pd.read_excel(eval_file)
+
+        # strict accuracy (same as original)
+        correct = (
+            data["prediction"].astype(str).str.strip().str.lower()
+            == data["answer"].astype(str).str.strip().str.lower()
+        ).sum()
+
+        total = len(data)
+        accuracy = correct / total if total > 0 else 0.0
+
+        return {"accuracy": accuracy}
+
