@@ -1,7 +1,7 @@
 import ast
 from .image_base import ImageBaseDataset
 from ..smp import *
-from .utils.sarena_mini import evaluate_sarena_mini
+
 
 
 class traffic_vqa_test(ImageBaseDataset):
