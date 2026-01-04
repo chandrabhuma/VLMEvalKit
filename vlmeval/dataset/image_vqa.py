@@ -11,7 +11,7 @@ from .utils import build_judge, DEBUG_MESSAGE
 from ..smp import *
 from ..smp.file import get_intermediate_file_path, get_file_extension
 from ..utils import track_progress_rich
-
+from huggingface_hub import hf_hub_download
 
 class ImageVQADataset(ImageBaseDataset):
     TYPE = 'VQA'
