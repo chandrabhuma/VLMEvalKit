@@ -53,31 +53,20 @@ def build_prompt(self, line):
 # 	        total = len(data)
 # 	        accuracy = correct / total
 # 	        return {'accuracy': accuracy}
+from ..smp import get_logger
+
+logger = get_logger(__name__)
+
 def evaluate(self, eval_file, **judge_kwargs):
-    result_file = get_intermediate_file_path(eval_file, '_acc')
+    data = load(eval_file)
 
-    if not osp.exists(result_file):
-        data = load(eval_file)
+    correct = (data['prediction'] == data['answer']).sum()
+    total = len(data)
+    accuracy = correct / total * 100
 
-        # required columns
-        assert 'prediction' in data and 'answer' in data
+    logger.info(
+        f"[traffic_vqa_test] Strict Accuracy = {accuracy:.2f}% "
+        f"({correct}/{total})"
+    )
 
-        # normalize to string
-        data['prediction'] = data['prediction'].astype(str)
-        data['answer'] = data['answer'].astype(str)
-
-        # strict accuracy
-        correct = (data['prediction'] == data['answer']).sum()
-        total = len(data)
-        accuracy = correct / total * 100
-
-        # VLMEvalKit expects a DataFrame
-        ret = {'Overall': accuracy}
-        ret = d2df(ret)
-        ret = ret.round(2)
-
-        dump(ret, result_file)
-
-    return load(result_file)
-
-	
+    return {"accuracy": accuracy}
