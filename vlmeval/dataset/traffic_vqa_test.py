@@ -53,20 +53,18 @@ def build_prompt(self, line):
 # 	        total = len(data)
 # 	        accuracy = correct / total
 # 	        return {'accuracy': accuracy}
-from ..smp import get_logger
-
-logger = get_logger(__name__)
-
 def evaluate(self, eval_file, **judge_kwargs):
     data = load(eval_file)
 
     correct = (data['prediction'] == data['answer']).sum()
     total = len(data)
-    accuracy = correct / total * 100
 
-    logger.info(
-        f"[traffic_vqa_test] Strict Accuracy = {accuracy:.2f}% "
-        f"({correct}/{total})"
-    )
+    acc = correct / total * 100
 
-    return {"accuracy": accuracy}
+    return {
+        "Strict Accuracy (%)": round(acc, 2),
+        "Correct": int(correct),
+        "Total": int(total),
+    }
+
+
