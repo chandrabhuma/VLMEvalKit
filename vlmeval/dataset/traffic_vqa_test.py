@@ -1,7 +1,7 @@
 import ast
 from .image_base import ImageBaseDataset
 from ..smp import *
-
+from .utils.sarena_mini import evaluate_sarena_mini
 
 import re
 
@@ -45,46 +45,10 @@ def build_prompt(self, line):
 	            if isinstance(question, str) and len(question) > 0:
 	                msgs.append(dict(type='text', value=question))
 	        return msgs
-# def evaluate(self, eval_file, **judge_kwargs):
-# 	        data = pd.read_excel(eval_file)
-# 	        correct = (data['prediction'] == data['answer']).sum()
-# 	        total = len(data)
-# 	        accuracy = correct / total
-# 	        return {'accuracy': accuracy}
-	
 def evaluate(self, eval_file, **judge_kwargs):
-    data = pd.read_excel(eval_file)
-
-    exact = 0
-    relaxed = 0
-
-    total = len(data)
-
-    for _, row in data.iterrows():
-        pred = str(row["prediction"])
-        gt = str(row["answer"])
-
-        # Exact accuracy
-        if pred == gt:
-            exact += 1
-
-        # Relaxed accuracy (case + space insensitive)
-        if pred.strip().lower() == gt.strip().lower():
-            relaxed += 1
-
-    exact_acc = exact / total
-    relaxed_acc = relaxed / total
-
-    # 🔥 PRINT IMMEDIATELY
-    print(f"\n📊 Evaluation Results ({self.DATASET_NAME})")
-    print(f"Exact Accuracy   : {exact_acc:.4f}")
-    print(f"Relaxed Accuracy : {relaxed_acc:.4f}\n")
-
-    return {
-        "accuracy": exact_acc,
-        "relaxed_accuracy": relaxed_acc,
-    }
-
-
-
-   
+	        data = pd.read_excel(eval_file)
+	        correct = (data['prediction'] == data['answer']).sum()
+	        total = len(data)
+	        accuracy = correct / total
+	        return {'accuracy': accuracy}
+	
