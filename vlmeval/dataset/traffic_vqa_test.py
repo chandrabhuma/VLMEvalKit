@@ -38,6 +38,8 @@ class traffic_vqa_test(ImageBaseDataset):
 		"houseobj_vqa_test": "https://huggingface.co/datasets/chandrabhuma/vlmevalkit_files/resolve/main/houseobj_vlm_test.tsv",
 		"graph_vqa_train": "https://huggingface.co/datasets/chandrabhuma/vlmevalkit_files/resolve/main/graph_vlm_train.tsv",
 		"graph_vqa_test": "https://huggingface.co/datasets/chandrabhuma/vlmevalkit_files/resolve/main/graph_vlm_test.tsv",
+		"chemtext_vqa_train": "https://huggingface.co/datasets/chandrabhuma/vlmevalkit_files/resolve/main/chemtext_vlm_train.tsv",
+		"chemtext_vqa_test": "https://huggingface.co/datasets/chandrabhuma/vlmevalkit_files/resolve/main/chemtext_vlm_test.tsv",
     }
 
 def build_prompt(self, line):
