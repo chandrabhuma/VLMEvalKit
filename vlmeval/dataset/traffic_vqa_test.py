@@ -10,7 +10,7 @@ class traffic_vqa_test(ImageBaseDataset):
 
     DATASET_URL = {
         "traffic_vqa_test": "https://huggingface.co/datasets/chandrabhuma/vlmevalkit_files/resolve/main/tafficvqa_vlm_test.tsv",
-		"traffic_vqa_train": "https://huggingface.co/datasets/chandrabhuma/vlmevalkit_files/resolve/main/tafficvqa_vlm_train.tsv"
+		"traffic_vqa_train": "https://huggingface.co/datasets/chandrabhuma/vlmevalkit_files/resolve/main/tafficvqa_vlm_train.tsv",
     }
 
 def build_prompt(self, line):
