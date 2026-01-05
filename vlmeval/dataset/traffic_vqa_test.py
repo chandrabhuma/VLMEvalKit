@@ -55,52 +55,34 @@ def build_prompt(self, line):
 def evaluate(self, eval_file, **judge_kwargs):
     data = pd.read_excel(eval_file)
 
-    exact_correct = 0
-    relaxed_correct = 0
-    vqa_total_score = 0.0
-
-    for _, row in data.iterrows():
-        pred = row["prediction"]
-        gt = row["answer"]
-
-        # Exact accuracy
-        if pred == gt:
-            exact_correct += 1
-
-        # Relaxed accuracy
-        if relaxed_match(pred, gt):
-            relaxed_correct += 1
-
-        # VQA accuracy
-        if isinstance(gt, list):
-            answers = gt
-        else:
-            try:
-                answers = ast.literal_eval(gt) if isinstance(gt, str) and gt.startswith("[") else [gt]
-            except Exception:
-                answers = [gt]
-
-        vqa_total_score += vqa_score(pred, answers)
+    exact = 0
+    relaxed = 0
 
     total = len(data)
 
-    exact_acc = exact_correct / total
-    relaxed_acc = relaxed_correct / total
-    vqa_acc = vqa_total_score / total
+    for _, row in data.iterrows():
+        pred = str(row["prediction"])
+        gt = str(row["answer"])
 
-    # 🔹 PRINT METRICS
-    print("=" * 50)
-    print(f"[{self.DATASET_NAME}] Evaluation Results")
+        # Exact accuracy
+        if pred == gt:
+            exact += 1
+
+        # Relaxed accuracy (case + space insensitive)
+        if pred.strip().lower() == gt.strip().lower():
+            relaxed += 1
+
+    exact_acc = exact / total
+    relaxed_acc = relaxed / total
+
+    # 🔥 PRINT IMMEDIATELY
+    print(f"\n📊 Evaluation Results ({self.DATASET_NAME})")
     print(f"Exact Accuracy   : {exact_acc:.4f}")
-    print(f"Relaxed Accuracy : {relaxed_acc:.4f}")
-    print(f"VQA Accuracy     : {vqa_acc:.4f}")
-    print("=" * 50)
+    print(f"Relaxed Accuracy : {relaxed_acc:.4f}\n")
 
-    # 🔹 RETURN for VLMEvalKit logging
     return {
         "accuracy": exact_acc,
         "relaxed_accuracy": relaxed_acc,
-        "vqa_accuracy": vqa_acc,
     }
 
 
