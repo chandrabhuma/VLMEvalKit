@@ -34,6 +34,8 @@ class traffic_vqa_test(ImageBaseDataset):
 		"traffic_vqa_train": "https://huggingface.co/datasets/chandrabhuma/vlmevalkit_files/resolve/main/tafficvqa_vlm_train.tsv",
 		"screenspot_vqa_train": "https://huggingface.co/datasets/chandrabhuma/vlmevalkit_files/resolve/main/screenspot_vlm_train.tsv",
 		"screenspot_vqa_test": "https://huggingface.co/datasets/chandrabhuma/vlmevalkit_files/resolve/main/screenspot_vlm_test.tsv",
+		"houseobj_vqa_train": "https://huggingface.co/datasets/chandrabhuma/vlmevalkit_files/resolve/main/houseobj_vlm_test.tsv",
+		"houseobj_vqa_test": "https://huggingface.co/datasets/chandrabhuma/vlmevalkit_files/resolve/main/houseobj_vlm_test.tsv",
     }
 
 def build_prompt(self, line):
