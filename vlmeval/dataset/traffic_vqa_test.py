@@ -47,10 +47,37 @@ def build_prompt(self, line):
 	            if isinstance(question, str) and len(question) > 0:
 	                msgs.append(dict(type='text', value=question))
 	        return msgs
+# def evaluate(self, eval_file, **judge_kwargs):
+# 	        data = pd.read_excel(eval_file)
+# 	        correct = (data['prediction'] == data['answer']).sum()
+# 	        total = len(data)
+# 	        accuracy = correct / total
+# 	        return {'accuracy': accuracy}
 def evaluate(self, eval_file, **judge_kwargs):
-	        data = pd.read_excel(eval_file)
-	        correct = (data['prediction'] == data['answer']).sum()
-	        total = len(data)
-	        accuracy = correct / total
-	        return {'accuracy': accuracy}
+    result_file = get_intermediate_file_path(eval_file, '_acc')
+
+    if not osp.exists(result_file):
+        data = load(eval_file)
+
+        # required columns
+        assert 'prediction' in data and 'answer' in data
+
+        # normalize to string
+        data['prediction'] = data['prediction'].astype(str)
+        data['answer'] = data['answer'].astype(str)
+
+        # strict accuracy
+        correct = (data['prediction'] == data['answer']).sum()
+        total = len(data)
+        accuracy = correct / total * 100
+
+        # VLMEvalKit expects a DataFrame
+        ret = {'Overall': accuracy}
+        ret = d2df(ret)
+        ret = ret.round(2)
+
+        dump(ret, result_file)
+
+    return load(result_file)
+
 	
