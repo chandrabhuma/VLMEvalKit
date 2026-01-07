@@ -45,7 +45,7 @@ class traffic_vqa_test(ImageBaseDataset):
 		"Chess_vqa_train": "https://huggingface.co/datasets/chandrabhuma/vlmevalkit_files/resolve/main/ChessVQA_vlm_train.tsv",
 		"Chess_vqa_test": "https://huggingface.co/datasets/chandrabhuma/vlmevalkit_files/resolve/main/ChessVQA_vlm_test.tsv",
         }
-        }
+        
 
 def build_prompt(self, line):
 	        msgs = []
