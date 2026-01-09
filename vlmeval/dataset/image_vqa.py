@@ -187,7 +187,13 @@ class VizWiz(ImageBaseDataset):
     }
     DATASET_MD5 = {'VizWiz': 'fa4ac4164467563ed2fac6eac6631bd0'}
 
-    @classmethod
+    def build_prompt(self, line):
+        msgs = super().build_prompt(line)
+        assert msgs[-1]['type'] == 'text'
+        msgs[-1][
+            'value'] += '\nAnswer the question using a single word or phrase.'
+        return msgs
+
     def evaluate(self, eval_file, **judge_kwargs):
         from .utils.vqa_eval import hit_calculate, process_line
 
