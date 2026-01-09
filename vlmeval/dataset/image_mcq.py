@@ -706,7 +706,7 @@ class MUIRDataset(ImageMCQDataset):
 class GMAIMMBenchDataset(ImageMCQDataset):
 
     DATASET_URL = {
-        'GMAI-MMBench_VAL': 'https://huggingface.co/datasets/OpenGVLab/GMAI-MMBench/blob/main/GMAI_mm_bench_VAL.tsv',
+        'GMAI-MMBench_VAL': 'https://huggingface.co/datasets/OpenGVLab/GMAI-MMBench/resolve/main/GMAI_mm_bench_VAL.tsv',
         'GMAI_mm_bench_TEST_part_1': 'https://huggingface.co/datasets/OpenGVLab/GMAI-MMBench/blob/main/GMAI_mm_bench_TEST_part_1.tsv',  # noqa: E501
         'GMAI_mm_bench_TEST_part_2': 'https://huggingface.co/datasets/OpenGVLab/GMAI-MMBench/blob/main/GMAI_mm_bench_TEST_part_2.tsv',  # noqa: E501
         'GMAI_mm_bench_TEST_part_3': 'https://huggingface.co/datasets/OpenGVLab/GMAI-MMBench/blob/main/GMAI_mm_bench_TEST_part_3.tsv',  # noqa: E501
