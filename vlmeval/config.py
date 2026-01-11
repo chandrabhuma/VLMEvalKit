@@ -799,7 +799,7 @@ interns1_mini = {
         InternS1Chat, model_path="/mnt/shared-storage-user/mllm/lijinsong/models/Intern-S1-mini/"
     ),
 }
-perception_lm_1b = {
+perception_series = {
     "Perception-LM-1B": partial(
         PerceptionLMChat,
         model_path="PIA-SPACE-LAB/Perception-LM-1B",
