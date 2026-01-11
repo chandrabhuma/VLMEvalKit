@@ -79,6 +79,9 @@ ungrouped = {
     ),
     "Pixtral-12B": partial(Pixtral, model_path="mistralai/Pixtral-12B-2409"),
     "Falcon2-VLM-11B": partial(Falcon2VLM, model_path="tiiuae/falcon-11B-vlm"),
+    "Perception-LM-1B": partial(PerceptionLMChat,  model_path="facebook/Perception-LM-1B"),
+    ),
+}
 }
 
 o1_key = os.environ.get('O1_API_KEY', None)
@@ -799,12 +802,7 @@ interns1_mini = {
         InternS1Chat, model_path="/mnt/shared-storage-user/mllm/lijinsong/models/Intern-S1-mini/"
     ),
 }
-perception_series = {
-    "Perception-LM-1B": partial(
-        PerceptionLMChat,
-        model_path="facebook/Perception-LM-1B",
-    ),
-}
+
 
 internvl = {
     "InternVL-Chat-V1-1": partial(
