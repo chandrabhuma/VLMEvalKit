@@ -8,7 +8,7 @@ from .base import BaseModel
 class PerceptionLM(BaseModel):
     def __init__(
         self,
-        model_path="PIA-SPACE-LAB/Perception-LM-1B",
+        model_path="facebook/Perception-LM-1B",
         device="cuda",
         dtype=torch.float16,
         **kwargs
