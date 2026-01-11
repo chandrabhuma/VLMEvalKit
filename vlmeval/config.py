@@ -802,7 +802,7 @@ interns1_mini = {
 perception_series = {
     "Perception-LM-1B": partial(
         PerceptionLMChat,
-        model_path="PIA-SPACE-LAB/Perception-LM-1B",
+        model_path="facebook/Perception-LM-1B",
     ),
 }
 
