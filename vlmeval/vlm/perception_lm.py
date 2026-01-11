@@ -5,6 +5,9 @@ from transformers import AutoProcessor, AutoModelForImageTextToText
 from .base import BaseModel
 
 
+from transformers import AutoProcessor, AutoModelForImageTextToText
+import torch
+
 class PerceptionLM(BaseModel):
     def __init__(
         self,
@@ -23,11 +26,14 @@ class PerceptionLM(BaseModel):
             trust_remote_code=True
         )
 
+        # Load model with auto device placement
         self.model = AutoModelForImageTextToText.from_pretrained(
             model_path,
             torch_dtype=dtype,
+            device_map="auto",  # <-- automatically spreads across GPU/CPU
             trust_remote_code=True
-        ).to(device).eval()
+        )
+        self.model.eval()
 
     @torch.no_grad()
     def generate(self, message, **kwargs):
