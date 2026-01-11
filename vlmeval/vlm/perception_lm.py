@@ -29,62 +29,88 @@ class PerceptionLM(BaseModel):
 
     @torch.no_grad()
     def generate(self, message, **kwargs):
-        """
-        VLMEvalKit message format:
-        [
-            {"type": "image", "value": image_path},
-            {"type": "text", "value": question}
-        ]
-        """
+    """
+    Supports BOTH VLMEvalKit formats:
 
-        image_path = None
-        question = ""
+    1) Shorthand:
+       ['image.jpg', 'question text']
 
-        for m in message:
-            if m["type"] == "image":
-                image_path = m["value"]
-            elif m["type"] == "text":
-                question += m["value"]
+    2) Structured:
+       [
+         {"type": "image", "value": image_path},
+         {"type": "text", "value": question}
+       ]
+    """
 
-        # ---- Build Perception-LM conversation ----
-        conversation = [
-            {
-                "role": "user",
-                "content": [
-                    {
-                        "type": "image",
-                        "url": image_path,   # local path works
-                    },
-                    {
-                        "type": "text",
-                        "text": question,
-                    },
-                ],
-            }
+    # -------------------------------------------------
+    # Normalize VLMEvalKit shorthand format
+    # -------------------------------------------------
+    if (
+        isinstance(message, list)
+        and len(message) == 2
+        and isinstance(message[0], str)
+        and isinstance(message[1], str)
+    ):
+        message = [
+            {"type": "image", "value": message[0]},
+            {"type": "text", "value": message[1]},
         ]
 
-        inputs = self.processor.apply_chat_template(
-            [conversation],
-            add_generation_prompt=True,
-            tokenize=True,
-            return_dict=True,
-            return_tensors="pt",
-        )
+    image_path = None
+    question = ""
 
-        inputs = inputs.to(self.device)
+    for m in message:
+        if m["type"] == "image":
+            image_path = m["value"]
+        elif m["type"] == "text":
+            question += m["value"]
 
-        generate_ids = self.model.generate(
-            **inputs,
-            max_new_tokens=64
-        )
+    if image_path is None:
+        raise ValueError("No image found in message")
 
-        # Remove input tokens (VERY IMPORTANT)
-        input_len = inputs["input_ids"].shape[1]
-        gen_ids = generate_ids[:, input_len:]
+    # -------------------------------------------------
+    # Build Perception-LM conversation
+    # -------------------------------------------------
+    conversation = [
+        {
+            "role": "user",
+            "content": [
+                {
+                    "type": "image",
+                    "url": image_path,   # local path works
+                },
+                {
+                    "type": "text",
+                    "text": question,
+                },
+            ],
+        }
+    ]
 
-        output = self.processor.batch_decode(
-            gen_ids,
-            skip_special_tokens=True
-        )[0]
+    inputs = self.processor.apply_chat_template(
+        [conversation],
+        add_generation_prompt=True,
+        tokenize=True,
+        return_dict=True,
+        return_tensors="pt",
+    )
 
-        return output.strip()
+    inputs = inputs.to(self.device)
+
+    generate_ids = self.model.generate(
+        **inputs,
+        max_new_tokens=64
+    )
+
+    # -------------------------------------------------
+    # Remove input tokens (VERY IMPORTANT)
+    # -------------------------------------------------
+    input_len = inputs["input_ids"].shape[1]
+    gen_ids = generate_ids[:, input_len:]
+
+    output = self.processor.batch_decode(
+        gen_ids,
+        skip_special_tokens=True
+    )[0]
+
+    return output.strip()
