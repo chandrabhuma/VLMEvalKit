@@ -19,98 +19,100 @@ class PerceptionLM(BaseModel):
 
         self.processor = AutoProcessor.from_pretrained(
             model_path,
-            use_fast=True
+            use_fast=True,
+            trust_remote_code=True
         )
 
         self.model = AutoModelForImageTextToText.from_pretrained(
             model_path,
-            torch_dtype=dtype
+            torch_dtype=dtype,
+            trust_remote_code=True
         ).to(device).eval()
 
     @torch.no_grad()
     def generate(self, message, **kwargs):
-    """
-    Supports BOTH VLMEvalKit formats:
+        """
+        Supports BOTH VLMEvalKit formats:
 
-    1) Shorthand:
-       ['image.jpg', 'question text']
+        1) Shorthand:
+           ['image.jpg', 'question text']
 
-    2) Structured:
-       [
-         {"type": "image", "value": image_path},
-         {"type": "text", "value": question}
-       ]
-    """
+        2) Structured:
+           [
+             {"type": "image", "value": image_path},
+             {"type": "text", "value": question}
+           ]
+        """
 
-    # -------------------------------------------------
-    # Normalize VLMEvalKit shorthand format
-    # -------------------------------------------------
-    if (
-        isinstance(message, list)
-        and len(message) == 2
-        and isinstance(message[0], str)
-        and isinstance(message[1], str)
-    ):
-        message = [
-            {"type": "image", "value": message[0]},
-            {"type": "text", "value": message[1]},
+        # -------------------------------------------------
+        # Normalize VLMEvalKit shorthand format
+        # -------------------------------------------------
+        if (
+            isinstance(message, list)
+            and len(message) == 2
+            and isinstance(message[0], str)
+            and isinstance(message[1], str)
+        ):
+            message = [
+                {"type": "image", "value": message[0]},
+                {"type": "text", "value": message[1]},
+            ]
+
+        image_path = None
+        question = ""
+
+        for m in message:
+            if m["type"] == "image":
+                image_path = m["value"]
+            elif m["type"] == "text":
+                question += m["value"]
+
+        if image_path is None:
+            raise ValueError("No image found in message")
+
+        # -------------------------------------------------
+        # Build Perception-LM conversation
+        # -------------------------------------------------
+        conversation = [
+            {
+                "role": "user",
+                "content": [
+                    {
+                        "type": "image",
+                        "url": image_path,  # local path works
+                    },
+                    {
+                        "type": "text",
+                        "text": question,
+                    },
+                ],
+            }
         ]
 
-    image_path = None
-    question = ""
+        inputs = self.processor.apply_chat_template(
+            [conversation],
+            add_generation_prompt=True,
+            tokenize=True,
+            return_dict=True,
+            return_tensors="pt",
+        )
 
-    for m in message:
-        if m["type"] == "image":
-            image_path = m["value"]
-        elif m["type"] == "text":
-            question += m["value"]
+        inputs = inputs.to(self.device)
 
-    if image_path is None:
-        raise ValueError("No image found in message")
+        generate_ids = self.model.generate(
+            **inputs,
+            max_new_tokens=64
+        )
 
-    # -------------------------------------------------
-    # Build Perception-LM conversation
-    # -------------------------------------------------
-    conversation = [
-        {
-            "role": "user",
-            "content": [
-                {
-                    "type": "image",
-                    "url": image_path,   # local path works
-                },
-                {
-                    "type": "text",
-                    "text": question,
-                },
-            ],
-        }
-    ]
+        # -------------------------------------------------
+        # Remove input tokens (VERY IMPORTANT)
+        # -------------------------------------------------
+        input_len = inputs["input_ids"].shape[1]
+        gen_ids = generate_ids[:, input_len:]
 
-    inputs = self.processor.apply_chat_template(
-        [conversation],
-        add_generation_prompt=True,
-        tokenize=True,
-        return_dict=True,
-        return_tensors="pt",
-    )
+        output = self.processor.batch_decode(
+            gen_ids,
+            skip_special_tokens=True
+        )[0]
 
-    inputs = inputs.to(self.device)
-
-    generate_ids = self.model.generate(
-        **inputs,
-        max_new_tokens=64
-    )
-
-    # -------------------------------------------------
-    # Remove input tokens (VERY IMPORTANT)
-    # -------------------------------------------------
-    input_len = inputs["input_ids"].shape[1]
-    gen_ids = generate_ids[:, input_len:]
-
-    output = self.processor.batch_decode(
-        gen_ids,
-        skip_special_tokens=True
-    )[0]
-
-    return output.strip()
+        return output.strip()
