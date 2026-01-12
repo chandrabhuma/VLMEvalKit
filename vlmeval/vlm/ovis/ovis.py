@@ -1,5 +1,5 @@
 import torch
-from transformers import AutoConfig, AutoModelForCausalLM
+from transformers import AutoModelForCausalLM
 
 from ..base import BaseModel
 from ...dataset import DATASET_TYPE, DATASET_MODALITY
@@ -319,25 +319,16 @@ class Ovis2(BaseModel):
         (64, 5120): '34B'
     }
 
-    def __init__(self, model_path='AIDC-AI/Ovis2-1B', **kwargs):
+    def __init__(self, model_path='AIDC-AI/Ovis2-8B', **kwargs):
         assert model_path is not None
         # Recommend to install `python=3.10`, `transformers==4.46.2`, `torch==2.4.0`, and `numpy==1.25.0`
         self.model_path = model_path
         self.device = torch.cuda.current_device()
         self.dtype = torch.bfloat16
-        # Force SDPA globally
-        torch.backends.cuda.sdp_kernel(enable_flash=False, enable_math=False,  enable_mem_efficient=False)
-
-        # Load config
-        config = AutoConfig.from_pretrained("AIDC-AI/Ovis2-8B", trust_remote_code=True)
-
-        # Override attention implementation
-        config.llm_attn_implementation = "eager"  # or "eager" if you prefer
         self.model = AutoModelForCausalLM.from_pretrained(
             self.model_path,
             torch_dtype=self.dtype,
             multimodal_max_length=32768,
-            config=config,
             trust_remote_code=True
         )
         self.size = self.SIZE_DICT[
