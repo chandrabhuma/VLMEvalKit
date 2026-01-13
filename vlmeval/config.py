@@ -1916,7 +1916,9 @@ insight_v_series = {
 cosmos_series = {
     'Cosmos-Reason1-7B': partial(Cosmos, model_path='nvidia/Cosmos-Reason1-7B', use_vllm=True),
 }
-
+ayavision_series = {
+    'Aya-Vision-8B': partial(AyaVision, model_path='CohereLabs/aya-vision-8b'),
+}
 keye_series = {
     "Keye-VL-1.5-8B-auto":partial(KeyeChat, model_path="Kwai-Keye/Keye-VL-1_5-8B"),
     "Keye-VL-1.5-8B-think":partial(KeyeChat, model_path="Kwai-Keye/Keye-VL-1_5-8B", think=True),
