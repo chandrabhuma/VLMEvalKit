@@ -21,8 +21,8 @@ class AyaVision(BaseModel):
         self.model.eval()
 
     def generate_inner(self, message, dataset=None):
-    content = []
-    image_path = None
+        content = []
+        image_path = None
 
     for item in message:
         if item['type'] == 'image':
