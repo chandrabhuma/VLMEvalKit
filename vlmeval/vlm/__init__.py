@@ -116,5 +116,5 @@ from .logics import Logics_Thinking
 from .cosmos import Cosmos
 from .liquid import LFM2VL
 from .insight_v import InsightV
-from .perception_lm import PerceptionLM
+from .ayavision import AyaVision
 
