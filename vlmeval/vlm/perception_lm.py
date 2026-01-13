@@ -61,37 +61,37 @@ class PerceptionLM(BaseModel):
 
         return chat_messages, images_pil
 
-   @torch.no_grad()
-def generate_inner(self, message, dataset=None):
-
-    instruction_prompt = self.custom_instruction_prompt_by_dataset(dataset)
-    chat_messages, _ = self.message_to_chat_messages(
-        message, instruction_prompt, dataset
-    )
-
-    # 🔑 MUST tokenize here (Perception-LM style)
-    inputs = self.processor.apply_chat_template(
-        chat_messages,
-        add_generation_prompt=True,
-        tokenize=True,
-        return_dict=True,
-        return_tensors="pt",
-    ).to(device=self.model.device, dtype=torch.float16)
-
-    # 🔑 Disable KV cache to avoid OOM on T4
-    output_ids = self.model.generate(
-        **inputs,
-        max_new_tokens=128,
-        use_cache=False,
-    )
-
-    # 🔑 Trim prompt tokens (VERY IMPORTANT)
-    input_len = inputs["input_ids"].shape[1]
-    gen_ids = output_ids[:, input_len:]
-
-    output = self.processor.batch_decode(
-        gen_ids,
-        skip_special_tokens=True
-    )[0]
-
-    return output.strip()
+   
+    def generate_inner(self, message, dataset=None):
+    
+        instruction_prompt = self.custom_instruction_prompt_by_dataset(dataset)
+        chat_messages, _ = self.message_to_chat_messages(
+            message, instruction_prompt, dataset
+        )
+    
+        # 🔑 MUST tokenize here (Perception-LM style)
+        inputs = self.processor.apply_chat_template(
+            chat_messages,
+            add_generation_prompt=True,
+            tokenize=True,
+            return_dict=True,
+            return_tensors="pt",
+        ).to(device=self.model.device, dtype=torch.float16)
+    
+        # 🔑 Disable KV cache to avoid OOM on T4
+        output_ids = self.model.generate(
+            **inputs,
+            max_new_tokens=128,
+            use_cache=False,
+        )
+    
+        # 🔑 Trim prompt tokens (VERY IMPORTANT)
+        input_len = inputs["input_ids"].shape[1]
+        gen_ids = output_ids[:, input_len:]
+    
+        output = self.processor.batch_decode(
+            gen_ids,
+            skip_special_tokens=True
+        )[0]
+    
+        return output.strip()
