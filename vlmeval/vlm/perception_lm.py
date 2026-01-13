@@ -21,7 +21,7 @@ class PerceptionLM(BaseModel):
         self.model = (
             AutoModelForImageTextToText.from_pretrained(model_path).to("cuda") )
 
-        kwargs_default = {"max_new_tokens": 1024, "use_cache": True}
+        kwargs_default = {"max_new_tokens": 256, "use_cache": True}
         kwargs_default.update(kwargs)
         self.kwargs = kwargs_default
 
