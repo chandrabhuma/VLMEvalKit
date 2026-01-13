@@ -5,8 +5,7 @@ from transformers import AutoProcessor, AutoModelForImageTextToText
 from .base import BaseModel
 
 
-from transformers import AutoProcessor, AutoModelForImageTextToText
-import torch
+
 
 #class PerceptionLM(BaseModel):
 
