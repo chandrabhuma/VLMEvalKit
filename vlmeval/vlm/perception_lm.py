@@ -17,16 +17,9 @@ class PerceptionLM(BaseModel):
             "\nPlease answer directly with only the final answer, "
             "do not give any explanation."
         )
-        self.processor = AutoProcessor.from_pretrained(model_path)
+        self.processor = AutoProcessor.from_pretrained(model_path, use_fast=True)
         self.model = (
-            AutoModelForImageTextToText.from_pretrained(
-                model_path,
-                attn_implementation="sdpa",
-                torch_dtype=torch.bfloat16,
-            )
-            .cuda()
-            .eval()
-        )
+            AutoModelForImageTextToText.from_pretrained(model_path).to("cuda") )
 
         kwargs_default = {"max_new_tokens": 1024, "use_cache": True}
         kwargs_default.update(kwargs)
