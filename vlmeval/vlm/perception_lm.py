@@ -8,117 +8,89 @@ from .base import BaseModel
 from transformers import AutoProcessor, AutoModelForImageTextToText
 import torch
 
+#class PerceptionLM(BaseModel):
+from .base import BaseModel
+import torch
+from PIL import Image
+from transformers import AutoProcessor, AutoModelForImageTextToText
+
+
 class PerceptionLM(BaseModel):
-    def __init__(
-        self,
-        model_path="facebook/Perception-LM-1B",
-        device="cuda",
-        dtype=torch.float16,
-        **kwargs
-    ):
-        super().__init__()
-
-        self.device = device
-
-        self.processor = AutoProcessor.from_pretrained(
-            model_path,
-            use_fast=True,
-            trust_remote_code=True
+    def __init__(self, model_path, **kwargs):
+        self.default_instruction_prompt = (
+            "\nPlease answer directly with only the final answer, "
+            "do not give any explanation."
+        )
+        self.processor = AutoProcessor.from_pretrained(model_path)
+        self.model = (
+            AutoModelForImageTextToText.from_pretrained(
+                model_path,
+                attn_implementation="sdpa",
+                torch_dtype=torch.bfloat16,
+            )
+            .cuda()
+            .eval()
         )
 
-        # Load model with auto device placement
-        self.model = AutoModelForImageTextToText.from_pretrained(
-            model_path,
-            torch_dtype=dtype,
-            device_map="auto",  # <-- automatically spreads across GPU/CPU
-            trust_remote_code=True
-        )
-        self.model.eval()
+        kwargs_default = {"max_new_tokens": 1024, "use_cache": True}
+        kwargs_default.update(kwargs)
+        self.kwargs = kwargs_default
 
-    @torch.no_grad()
-    def generate(self, message, **kwargs):
-        """
-        Supports BOTH VLMEvalKit formats:
+    def custom_instruction_prompt_by_dataset(self, dataset):
+        if dataset == "MathVista_MINI" or dataset == "MM-IFEval" or dataset == "MMVet":
+            return ""
+        else:
+            return self.default_instruction_prompt
 
-        1) Shorthand:
-           ['image.jpg', 'question text']
+    def message_to_chat_messages(self, message, instruction_prompt, dataset):
+        single_turn_messages = []
+        image_paths = []
 
-        2) Structured:
-           [
-             {"type": "image", "value": image_path},
-             {"type": "text", "value": question}
-           ]
-        """
+        for item in message:
+            if item["type"] == "image":
+                image_paths.append(item["value"])
+                single_turn_messages.append({"type": "image", "url": item["value"]})
+            elif item["type"] == "text":
+                single_turn_messages.append({"type": "text", "text": item["value"]})
+        if instruction_prompt:
+            single_turn_messages.append({"type": "text", "text": instruction_prompt})
 
-        # -------------------------------------------------
-        # Normalize VLMEvalKit shorthand format
-        # -------------------------------------------------
-        if (
-            isinstance(message, list)
-            and len(message) == 2
-            and isinstance(message[0], str)
-            and isinstance(message[1], str)
-        ):
-            message = [
-                {"type": "image", "value": message[0]},
-                {"type": "text", "value": message[1]},
-            ]
+        if dataset == "MM-IFEval":
+            # move images to the beginning of the conversation list, in the same order as they appear in the message
+            index = 0
+            image_index = 0
+            while index < len(single_turn_messages):
+                if single_turn_messages[index]["type"] == "image":
+                    single_turn_messages.insert(
+                        image_index, single_turn_messages.pop(index)
+                    )
+                    image_index += 1
+                index += 1
 
-        image_path = None
-        question = ""
+        chat_messages = [{"role": "user", "content": single_turn_messages}]
+        images_pil = [Image.open(p).convert("RGB") for p in image_paths]
 
-        for m in message:
-            if m["type"] == "image":
-                image_path = m["value"]
-            elif m["type"] == "text":
-                question += m["value"]
+        return chat_messages, images_pil
 
-        if image_path is None:
-            raise ValueError("No image found in message")
+    def generate_inner(self, message, dataset=None):
+        instruction_prompt = self.custom_instruction_prompt_by_dataset(dataset)
 
-        # -------------------------------------------------
-        # Build Perception-LM conversation
-        # -------------------------------------------------
-        conversation = [
-            {
-                "role": "user",
-                "content": [
-                    {
-                        "type": "image",
-                        "url": image_path,  # local path works
-                    },
-                    {
-                        "type": "text",
-                        "text": question,
-                    },
-                ],
-            }
-        ]
+        chat_messages, images = self.message_to_chat_messages(message, instruction_prompt, dataset)
 
-        inputs = self.processor.apply_chat_template(
-            [conversation],
-            add_generation_prompt=True,
-            tokenize=True,
-            return_dict=True,
+        chat_inputs = self.processor.apply_chat_template(chat_messages, add_generation_prompt=True, tokenize=False)
+
+        generation_inputs = self.processor(
+            images=images,
+            text=[chat_inputs],
             return_tensors="pt",
-        )
+        ).to(dtype=torch.bfloat16, device="cuda")
 
-        inputs = inputs.to(self.device)
+        history = self.model.generate(**generation_inputs, **self.kwargs)
+        decoded = self.processor.decode(history[0], skip_special_tokens=False)
+        assistant_response = decoded.split("<|im_start|>assistant\n")[-1].strip()
+        if assistant_response.endswith("<|im_end|>"):
+            assistant_response = assistant_response[:-10]
+        return assistant_response
 
-        generate_ids = self.model.generate(
-            **inputs,
-            max_new_tokens=64
-        )
-
-        # -------------------------------------------------
-        # Remove input tokens (VERY IMPORTANT)
-        # -------------------------------------------------
-        input_len = inputs["input_ids"].shape[1]
-        gen_ids = generate_ids[:, input_len:]
-
-        output = self.processor.batch_decode(
-            gen_ids,
-            skip_special_tokens=True
-        )[0]
-
-        return output.strip()
+    def chat_inner(self, message, dataset=None):
+        return self.generate_inner(message, dataset)
