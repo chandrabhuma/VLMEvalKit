@@ -62,9 +62,9 @@ class AyaVision(BaseModel):
         with torch.no_grad():
             gen_tokens = self.model.generate(
                 **inputs,
-                max_new_tokens=512,
-                do_sample=False,  # VLMEvalKit usually uses greedy unless specified
-                temperature=0.0,
+                max_new_tokens=300,
+                do_sample=True,  # VLMEvalKit usually uses greedy unless specified
+                temperature=0.3,
             )
 
         # Decode only the generated part
