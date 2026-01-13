@@ -9,10 +9,7 @@ from transformers import AutoProcessor, AutoModelForImageTextToText
 import torch
 
 #class PerceptionLM(BaseModel):
-from .base import BaseModel
-import torch
-from PIL import Image
-from transformers import AutoProcessor, AutoModelForImageTextToText
+
 
 
 class PerceptionLM(BaseModel):
