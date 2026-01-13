@@ -25,9 +25,20 @@ class AyaVision(BaseModel):
             **kwargs
         )
         self.model.eval()
-
-    
     def generate_inner(self, message, dataset=None):
+
+        # 🔑 Normalize VLMEvalKit shorthand
+        if (
+            isinstance(message, list)
+            and len(message) == 2
+            and isinstance(message[0], str)
+            and isinstance(message[1], str)
+        ):
+            message = [
+                {"type": "image", "value": message[0]},
+                {"type": "text", "value": message[1]},
+            ]
+
         content = []
         image_path = None
 
@@ -54,9 +65,7 @@ class AyaVision(BaseModel):
             tokenize=True,
             return_dict=True,
             return_tensors="pt",
-        )
-
-        inputs = inputs.to(self.model.device)
+        ).to(self.model.device)
 
         outputs = self.model.generate(
             **inputs,
