@@ -61,25 +61,37 @@ class PerceptionLM(BaseModel):
 
         return chat_messages, images_pil
 
-    def generate_inner(self, message, dataset=None):
-        instruction_prompt = self.custom_instruction_prompt_by_dataset(dataset)
+   @torch.no_grad()
+def generate_inner(self, message, dataset=None):
 
-        chat_messages, images = self.message_to_chat_messages(message, instruction_prompt, dataset)
+    instruction_prompt = self.custom_instruction_prompt_by_dataset(dataset)
+    chat_messages, _ = self.message_to_chat_messages(
+        message, instruction_prompt, dataset
+    )
 
-        chat_inputs = self.processor.apply_chat_template(chat_messages, add_generation_prompt=True, tokenize=False)
+    # 🔑 MUST tokenize here (Perception-LM style)
+    inputs = self.processor.apply_chat_template(
+        chat_messages,
+        add_generation_prompt=True,
+        tokenize=True,
+        return_dict=True,
+        return_tensors="pt",
+    ).to(device=self.model.device, dtype=torch.float16)
 
-        generation_inputs = self.processor(
-            images=images,
-            text=[chat_inputs],
-            return_tensors="pt",
-        ).to(dtype=torch.bfloat16, device="cuda")
+    # 🔑 Disable KV cache to avoid OOM on T4
+    output_ids = self.model.generate(
+        **inputs,
+        max_new_tokens=128,
+        use_cache=False,
+    )
 
-        history = self.model.generate(**generation_inputs, **self.kwargs)
-        decoded = self.processor.decode(history[0], skip_special_tokens=False)
-        assistant_response = decoded.split("<|im_start|>assistant\n")[-1].strip()
-        if assistant_response.endswith("<|im_end|>"):
-            assistant_response = assistant_response[:-10]
-        return assistant_response
+    # 🔑 Trim prompt tokens (VERY IMPORTANT)
+    input_len = inputs["input_ids"].shape[1]
+    gen_ids = output_ids[:, input_len:]
 
-    def chat_inner(self, message, dataset=None):
-        return self.generate_inner(message, dataset)
+    output = self.processor.batch_decode(
+        gen_ids,
+        skip_special_tokens=True
+    )[0]
+
+    return output.strip()
