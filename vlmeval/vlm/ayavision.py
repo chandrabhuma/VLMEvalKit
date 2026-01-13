@@ -21,56 +21,47 @@ class AyaVision(BaseModel):
         self.model.eval()
 
     def generate_inner(self, message, dataset=None):
-        """
-        VLMEvalKit expects this method.
-        `message` is a list of mixed text/image elements in VLMEvalKit format.
-        Example:
-          [{'type': 'image', 'value': '/path/to/image.jpg'},
-           {'type': 'text', 'value': 'What is shown?'}]
-        """
-        # Reconstruct messages in Aya Vision chat format
-        content = []
-        image_path = None
+    content = []
+    image_path = None
 
-        for item in message:
-            if item['type'] == 'image':
-                image_path = item['value']
-                content.append({"type": "image"})
-            elif item['type'] == 'text':
-                content.append({"type": "text", "text": item['value']})
+    for item in message:
+        if item['type'] == 'image':
+            image_path = item['value']
+            assert os.path.exists(image_path), f"Image not found: {image_path}"
+            content.append({"type": "image"})
+        elif item['type'] == 'text':
+            content.append({"type": "text", "text": item['value']})
 
-        if image_path is None:
-            raise ValueError("No image provided in the message.")
+    if not image_path:
+        raise ValueError("No image provided")
 
-        # Load image
-        image = Image.open(image_path).convert("RGB")
+    # Load and verify image
+    image = Image.open(image_path).convert("RGB")
+    # Optional: display in debug mode
+    # image.show()
 
-        # Build chat message
-        messages = [{"role": "user", "content": content}]
+    messages = [{"role": "user", "content": content}]
+    inputs = self.processor.apply_chat_template(
+        messages,
+        padding=True,
+        add_generation_prompt=True,
+        tokenize=True,
+        return_dict=True,
+        return_tensors="pt"
+    ).to(self.model.device)
 
-        # Apply chat template and tokenize
-        inputs = self.processor.apply_chat_template(
-            messages,
-            padding=True,
-            add_generation_prompt=True,
-            tokenize=True,
-            return_dict=True,
-            return_tensors="pt"
-        ).to(self.model.device)
+    # Critical: ensure pixel_values are present
+    if 'pixel_values' not in inputs:
+        raise RuntimeError("Image features not processed! Check processor.")
 
-        # Generate
-        with torch.no_grad():
-            gen_tokens = self.model.generate(
-                **inputs,
-                max_new_tokens=300,
-                do_sample=True,  # VLMEvalKit usually uses greedy unless specified
-                temperature=0.3,
-            )
+    with torch.no_grad():
+        gen_tokens = self.model.generate(
+            **inputs,
+            max_new_tokens=300,
+            do_sample=True,
+            temperature=0.3,
+        )
 
-        # Decode only the generated part
-        input_len = inputs.input_ids.shape[1]
-        output_text = self.processor.tokenizer.decode(
-            gen_tokens[0][input_len:], skip_special_tokens=True
-        ).strip()
-
-        return output_text
+    input_len = inputs.input_ids.shape[1]
+    output = self.processor.decode(gen_tokens[0][input_len:], skip_special_tokens=True).strip()
+    return output
