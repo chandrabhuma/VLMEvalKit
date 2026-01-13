@@ -62,6 +62,6 @@ class AyaVision(BaseModel):
             temperature=0.3,
         )
 
-    input_len = inputs.input_ids.shape[1]
-    output = self.processor.decode(gen_tokens[0][input_len:], skip_special_tokens=True).strip()
-    return output
+        input_len = inputs.input_ids.shape[1]
+        output = self.processor.decode(gen_tokens[0][input_len:], skip_special_tokens=True).strip()
+        return output
