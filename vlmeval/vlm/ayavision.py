@@ -26,25 +26,20 @@ class AyaVision(BaseModel):
         )
         self.model.eval()
 
-    @torch.no_grad()
+    
     def generate_inner(self, message, dataset=None):
         content = []
         image_path = None
 
-        # 🔧 FIX: this loop MUST be inside the method
         for item in message:
             if item["type"] == "image":
                 image_path = item["value"]
-                assert os.path.exists(image_path), f"Image not found: {image_path}"
                 content.append({"type": "image"})
             elif item["type"] == "text":
                 content.append({"type": "text", "text": item["value"]})
 
         if image_path is None:
             raise ValueError("No image provided")
-
-        # Load image (processor will use it internally)
-        image = Image.open(image_path).convert("RGB")
 
         messages = [
             {
@@ -59,23 +54,20 @@ class AyaVision(BaseModel):
             tokenize=True,
             return_dict=True,
             return_tensors="pt",
-        ).to(self.model.device)
+        )
 
-        # Safety check
-        if "pixel_values" not in inputs:
-            raise RuntimeError("Image features not processed! Check processor.")
+        inputs = inputs.to(self.model.device)
 
-        gen_tokens = self.model.generate(
+        outputs = self.model.generate(
             **inputs,
-            max_new_tokens=300,
-            do_sample=True,
-            temperature=0.3,
+            max_new_tokens=256,
+            use_cache=False,
         )
 
         input_len = inputs["input_ids"].shape[1]
-        output = self.processor.decode(
-            gen_tokens[0][input_len:],
-            skip_special_tokens=True
-        ).strip()
+        output = self.processor.batch_decode(
+            outputs[:, input_len:],
+            skip_special_tokens=True,
+        )[0]
 
-        return output
+        return output.strip()
