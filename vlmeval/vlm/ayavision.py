@@ -90,6 +90,7 @@ class AyaVision(BaseModel):
             **inputs,
             max_new_tokens=300,
             temperature=0.3,
+            use_cache=False, 
             do_sample=True,
         )
 
