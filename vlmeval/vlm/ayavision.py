@@ -26,8 +26,17 @@ class AyaVision(BaseModel):
         )
         self.model.eval()
     def generate_inner(self, message, dataset=None):
+import torch
+from PIL import Image
 
-        # 🔑 Normalize VLMEvalKit shorthand
+
+
+    def generate_inner(self, message, dataset=None):
+
+        # --------------------------------------------------
+        # 1. Normalize VLMEvalKit shorthand
+        # ['img.jpg', 'question']
+        # --------------------------------------------------
         if (
             isinstance(message, list)
             and len(message) == 2
@@ -39,44 +48,57 @@ class AyaVision(BaseModel):
                 {"type": "text", "value": message[1]},
             ]
 
-        content = []
         image_path = None
+        text = ""
 
         for item in message:
             if item["type"] == "image":
                 image_path = item["value"]
-                content.append({"type": "image"})
             elif item["type"] == "text":
-                content.append({"type": "text", "text": item["value"]})
+                text += item["value"]
 
         if image_path is None:
             raise ValueError("No image provided")
 
-        messages = [
+        # --------------------------------------------------
+        # 2. Load image (VLMEvalKit gives path, HF expects PIL)
+        # --------------------------------------------------
+        image = Image.open(image_path).convert("RGB")
+
+        # --------------------------------------------------
+        # 3. Build conversation EXACTLY like your example
+        # --------------------------------------------------
+        conversation = [
             {
                 "role": "user",
-                "content": content,
+                "content": [
+                    {"type": "image", "image": image},
+                    {"type": "text", "text": text},
+                ],
             }
         ]
 
+        # --------------------------------------------------
+        # 4. Apply chat template (CRITICAL: tokenize=True)
+        # --------------------------------------------------
         inputs = self.processor.apply_chat_template(
-            messages,
+            conversation,
             add_generation_prompt=True,
             tokenize=True,
             return_dict=True,
             return_tensors="pt",
         ).to(self.model.device)
 
-        outputs = self.model.generate(
+        # --------------------------------------------------
+        # 5. Generate (T4-safe)
+        # --------------------------------------------------
+        gen_tokens = self.model.generate(
             **inputs,
-            max_new_tokens=256,
+            max_new_tokens=300,
+            temparature = 0.3,
             use_cache=False,
         )
 
-        input_len = inputs["input_ids"].shape[1]
-        output = self.processor.batch_decode(
-            outputs[:, input_len:],
-            skip_special_tokens=True,
-        )[0]
+        textout = processor.tokenizer.decode(gen_tokens[0][inputs.input_ids.shape[1]:], skip_special_tokens=True)
 
-        return output.strip()
+        return textout
