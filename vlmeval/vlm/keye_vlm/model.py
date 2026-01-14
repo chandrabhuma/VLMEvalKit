@@ -73,7 +73,7 @@ class KeyeChat(Qwen2VLPromptMixin, BaseModel):
                 AutoModel.from_pretrained(
                     model_path,
                     torch_dtype=torch.bfloat16,
-                    _attn_implementation="sdpa",
+                    _attn_implementation="eager",
                     trust_remote_code=True,
                     device_map="cuda",
                 )
@@ -105,7 +105,7 @@ class KeyeChat(Qwen2VLPromptMixin, BaseModel):
                 max_num_batched_tokens=161072,
                 max_model_len=161072,
                 trust_remote_code=True,
-                enforce_eager=False,
+                enforce_eager=True,
                 tensor_parallel_size=tp_size,
                 limit_mm_per_prompt={"image": 100, "video": 10},
             )
