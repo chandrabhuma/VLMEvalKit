@@ -26,13 +26,6 @@ class AyaVision(BaseModel):
         )
         self.model.eval()
     def generate_inner(self, message, dataset=None):
-import torch
-from PIL import Image
-
-
-
-    def generate_inner(self, message, dataset=None):
-
         # --------------------------------------------------
         # 1. Normalize VLMEvalKit shorthand
         # ['img.jpg', 'question']
@@ -84,6 +77,7 @@ from PIL import Image
         inputs = self.processor.apply_chat_template(
             conversation,
             add_generation_prompt=True,
+            padding=True,
             tokenize=True,
             return_dict=True,
             return_tensors="pt",
@@ -95,8 +89,8 @@ from PIL import Image
         gen_tokens = self.model.generate(
             **inputs,
             max_new_tokens=300,
-            temparature = 0.3,
-            use_cache=False,
+            temperature=0.3,
+            do_sample=True,
         )
 
         textout = processor.tokenizer.decode(gen_tokens[0][inputs.input_ids.shape[1]:], skip_special_tokens=True)
