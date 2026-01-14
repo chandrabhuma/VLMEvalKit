@@ -23,7 +23,7 @@ class AyaVision(BaseModel):
         self.model.eval()
 
     def generate_inner(self, message, dataset=None):
-        # Normalize VLMEvalKit input: ['img.jpg', 'question']
+        # Normalize VLMEvalKit shorthand
         if (
             isinstance(message, list)
             and len(message) == 2
@@ -47,25 +47,30 @@ class AyaVision(BaseModel):
         if not image_path or not os.path.exists(image_path):
             raise FileNotFoundError(f"Image not found: {image_path}")
 
-        # Load image
         image = Image.open(image_path).convert("RGB")
 
-        # ✅ Build message EXACTLY like your working HF example,
-        #    but replace URL with PIL image
-        conversation = [
+        # ✅ Step 1: Build message for apply_chat_template (NO image data)
+        chat_msg = [
             {
                 "role": "user",
                 "content": [
-                    {"type": "image", "image": image},   # ← PIL.Image here
+                    {"type": "image"},  # placeholder only
                     {"type": "text", "text": text_prompt},
                 ],
             }
         ]
 
-        # ✅ This is the key: use the processor as a CALLABLE with messages
-        #    NOT apply_chat_template alone!
+        # ✅ Step 2: Get formatted prompt WITH <image> token
+        prompt_text = self.processor.apply_chat_template(
+            chat_msg,
+            add_generation_prompt=True,
+            tokenize=False  # ← returns string
+        )
+
+        # ✅ Step 3: Process text + image together
         inputs = self.processor(
-            conversation,
+            text=prompt_text,
+            images=image,
             return_tensors="pt",
             padding=True,
         ).to(self.model.device)
@@ -80,7 +85,7 @@ class AyaVision(BaseModel):
                 top_p=0.95,
             )
 
-        # Decode only the new tokens
+        # Decode only the new part
         input_len = inputs.input_ids.shape[1]
         output_text = self.processor.tokenizer.decode(
             gen_tokens[0][input_len:], skip_special_tokens=True
