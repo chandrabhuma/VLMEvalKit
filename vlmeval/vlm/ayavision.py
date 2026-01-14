@@ -93,6 +93,6 @@ class AyaVision(BaseModel):
             do_sample=True,
         )
 
-        textout = processor.tokenizer.decode(gen_tokens[0][inputs.input_ids.shape[1]:], skip_special_tokens=True)
+        textout = self.processor.tokenizer.decode(gen_tokens[0][inputs.input_ids.shape[1]:], skip_special_tokens=True)
 
         return textout
