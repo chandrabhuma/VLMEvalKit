@@ -1,5 +1,3 @@
-# vlmeval/vlm/ayavision.py
-
 import os
 import torch
 from PIL import Image
@@ -8,15 +6,13 @@ from .base import BaseModel
 
 
 class AyaVision(BaseModel):
-    def __init__(self, model_path="CohereLabs/aya-vision-8b", **kwargs):
+    def __init__(self, model_path="CohereLabs/aya-vision-8b", temperature=0.3, max_new_tokens=300, **kwargs):
         super().__init__()
         self.model_path = model_path
+        self.temperature = temperature
+        self.max_new_tokens = max_new_tokens
 
-        self.processor = AutoProcessor.from_pretrained(
-            model_path,
-            trust_remote_code=True
-        )
-
+        self.processor = AutoProcessor.from_pretrained(model_path, trust_remote_code=True)
         self.model = AutoModelForImageTextToText.from_pretrained(
             model_path,
             device_map="auto",
@@ -25,11 +21,9 @@ class AyaVision(BaseModel):
             **kwargs
         )
         self.model.eval()
+
     def generate_inner(self, message, dataset=None):
-        # --------------------------------------------------
-        # 1. Normalize VLMEvalKit shorthand
-        # ['img.jpg', 'question']
-        # --------------------------------------------------
+        # Normalize VLMEvalKit input: ['img.jpg', 'question']
         if (
             isinstance(message, list)
             and len(message) == 2
@@ -42,58 +36,54 @@ class AyaVision(BaseModel):
             ]
 
         image_path = None
-        text = ""
+        text_prompt = ""
 
         for item in message:
             if item["type"] == "image":
                 image_path = item["value"]
             elif item["type"] == "text":
-                text += item["value"]
+                text_prompt = item["value"]
 
-        if image_path is None:
-            raise ValueError("No image provided")
+        if not image_path or not os.path.exists(image_path):
+            raise FileNotFoundError(f"Image not found: {image_path}")
 
-        # --------------------------------------------------
-        # 2. Load image (VLMEvalKit gives path, HF expects PIL)
-        # --------------------------------------------------
+        # Load image
         image = Image.open(image_path).convert("RGB")
 
-        # --------------------------------------------------
-        # 3. Build conversation EXACTLY like your example
-        # --------------------------------------------------
+        # ✅ Build message EXACTLY like your working HF example,
+        #    but replace URL with PIL image
         conversation = [
             {
                 "role": "user",
                 "content": [
-                    {"type": "image", "image": image},
-                    {"type": "text", "text": text},
+                    {"type": "image", "image": image},   # ← PIL.Image here
+                    {"type": "text", "text": text_prompt},
                 ],
             }
         ]
 
-        # --------------------------------------------------
-        # 4. Apply chat template (CRITICAL: tokenize=True)
-        # --------------------------------------------------
-        inputs = self.processor.apply_chat_template(
+        # ✅ This is the key: use the processor as a CALLABLE with messages
+        #    NOT apply_chat_template alone!
+        inputs = self.processor(
             conversation,
-            add_generation_prompt=True,
-            padding=True,
-            tokenize=True,
-            return_dict=True,
             return_tensors="pt",
+            padding=True,
         ).to(self.model.device)
 
-        # --------------------------------------------------
-        # 5. Generate (T4-safe)
-        # --------------------------------------------------
-        gen_tokens = self.model.generate(
-            **inputs,
-            max_new_tokens=300,
-            temperature=0.3,
-            use_cache=False, 
-            do_sample=True,
-        )
+        # Generate
+        with torch.no_grad():
+            gen_tokens = self.model.generate(
+                **inputs,
+                max_new_tokens=self.max_new_tokens,
+                do_sample=True,
+                temperature=self.temperature,
+                top_p=0.95,
+            )
 
-        textout = self.processor.tokenizer.decode(gen_tokens[0][inputs.input_ids.shape[1]:], skip_special_tokens=True)
+        # Decode only the new tokens
+        input_len = inputs.input_ids.shape[1]
+        output_text = self.processor.tokenizer.decode(
+            gen_tokens[0][input_len:], skip_special_tokens=True
+        ).strip()
 
-        return textout
+        return output_text
