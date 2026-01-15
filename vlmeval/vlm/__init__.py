@@ -117,4 +117,5 @@ from .cosmos import Cosmos
 from .liquid import LFM2VL
 from .insight_v import InsightV
 from .ayavision import AyaVision
+from .sa2va import SA2VA
 
