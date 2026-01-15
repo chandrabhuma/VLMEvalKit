@@ -1922,6 +1922,12 @@ sa2va_series = {
     'Sa2VA-4B': partial(SA2VA, model_path='ByteDance/Sa2VA-4B'),
     'Sa2VA-8B': partial(SA2VA, model_path='ByteDance/Sa2VA-8B'),
     'Sa2VA-26B': partial(SA2VA, model_path='ByteDance/Sa2VA-26B'),
+    'Sa2VA-InternVL3-2B': partial(SA2VA, model_path='ByteDance/Sa2VA-InternVL3-2B'),
+    'Sa2VA-InternVL3-8B': partial(SA2VA, model_path='ByteDance/Sa2VA-InternVL3-8B'),
+    'Sa2VA-InternVL3-14B': partial(SA2VA, model_path='ByteDance/Sa2VA-InternVL3-14B'),
+    'Sa2VA-Qwen2_5-VL-3B': partial(SA2VA, model_path='ByteDance/Sa2VA-Qwen2_5-VL-3B'),
+    'Sa2VA-Qwen2_5-VL-7B': partial(SA2VA, model_path='ByteDance/Sa2VA-Qwen2_5-VL-7B'),
+    
 }
 keye_series = {
     "Keye-VL-1.5-8B-auto":partial(KeyeChat, model_path="Kwai-Keye/Keye-VL-1_5-8B"),
