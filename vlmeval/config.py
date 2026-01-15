@@ -1918,7 +1918,10 @@ ayavision_series = {
     'Aya-Vision-8B': partial(AyaVision, model_path='CohereLabs/aya-vision-8b'),
 }
 sa2va_series = {
+    'Sa2VA-1B': partial(SA2VA, model_path='ByteDance/Sa2VA-1B'),
     'Sa2VA-4B': partial(SA2VA, model_path='ByteDance/Sa2VA-4B'),
+    'Sa2VA-8B': partial(SA2VA, model_path='ByteDance/Sa2VA-8B'),
+    'Sa2VA-26B': partial(SA2VA, model_path='ByteDance/Sa2VA-26B'),
 }
 keye_series = {
     "Keye-VL-1.5-8B-auto":partial(KeyeChat, model_path="Kwai-Keye/Keye-VL-1_5-8B"),
