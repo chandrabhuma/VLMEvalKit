@@ -8,7 +8,7 @@ from .base import BaseModel
 
 
 class SA2VA(BaseModel):
-    def __init__(self, model_path="ByteDance/Sa2VA-1B", **kwargs):
+    def __init__(self, model_path, **kwargs):
         super().__init__()
         self.model_path = model_path
 
