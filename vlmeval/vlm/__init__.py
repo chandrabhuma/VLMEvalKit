@@ -119,4 +119,5 @@ from .insight_v import InsightV
 from .ayavision import AyaVision
 from .sa2va import SA2VA
 from .kanana import Kanana
+from .jina import JinaVLM
 
