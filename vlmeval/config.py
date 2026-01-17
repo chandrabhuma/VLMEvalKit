@@ -1939,6 +1939,7 @@ jina_series = {
 
 towervision_series = {
     'TowerVision-2B': partial(TowerVision, model_path='utter-project/TowerVision-2B'),
+    'TowerVision-9B': partial(TowerVision, model_path='utter-project/TowerVision-9B'),
 }
 keye_series = {
     "Keye-VL-1.5-8B-auto":partial(KeyeChat, model_path="Kwai-Keye/Keye-VL-1_5-8B"),
