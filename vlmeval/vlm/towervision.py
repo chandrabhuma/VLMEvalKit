@@ -12,7 +12,6 @@ class TowerVision(BaseModel):
         super().__init__()
         self.model_path = model_path
 
-        # Load processor and model
         self.processor = LlavaNextProcessor.from_pretrained(model_path)
         self.model = LlavaNextForConditionalGeneration.from_pretrained(
             model_path,
@@ -23,13 +22,7 @@ class TowerVision(BaseModel):
         self.model.eval()
 
     def generate_inner(self, message, dataset=None):
-        """
-        VLMEvalKit passes message as:
-          [{'type': 'image', 'value': '/path/to/image.jpg'},
-           {'type': 'text', 'value': 'Describe this image.'}]
-        or shorthand: ['/path.jpg', 'prompt']
-        """
-        # Normalize shorthand input
+        # Normalize input
         if (
             isinstance(message, list)
             and len(message) == 2
@@ -53,13 +46,27 @@ class TowerVision(BaseModel):
         if not image_path or not os.path.exists(image_path):
             raise FileNotFoundError(f"Image not found: {image_path}")
 
-        # Load image
         image = Image.open(image_path).convert("RGB")
 
-        # Format prompt: <image>\n{query}
-        prompt = f"<image>\n{text_prompt}"
+        # ✅ Use chat template for correct prompt formatting
+        conversation = [
+            {
+                "role": "user",
+                "content": [
+                    {"type": "image"},
+                    {"type": "text", "text": text_prompt},
+                ],
+            }
+        ]
 
-        # Tokenize + embed image
+        # Apply chat template to get full prompt with roles and <image>
+        prompt = self.processor.apply_chat_template(
+            conversation,
+            add_generation_prompt=True,
+            tokenize=False
+        )
+
+        # Process
         inputs = self.processor(
             text=prompt,
             images=image,
@@ -71,15 +78,19 @@ class TowerVision(BaseModel):
             gen_tokens = self.model.generate(
                 **inputs,
                 max_new_tokens=512,
-                do_sample=False,      # deterministic for eval
+                do_sample=False,
                 temperature=0.0,
             )
 
-        # Decode only the new tokens
-        input_len = inputs.input_ids.shape[1]
-        response = self.processor.tokenizer.decode(
-            gen_tokens[0][input_len:],
-            skip_special_tokens=True
-        ).strip()
+        # ✅ Decode full output and remove input part safely
+        full_output = self.processor.batch_decode(gen_tokens, skip_special_tokens=True)[0]
+
+        # Optional: strip input prompt if needed (usually not necessary with skip_special_tokens)
+        # But if you want to be sure:
+        input_text = self.processor.batch_decode(inputs.input_ids, skip_special_tokens=True)[0]
+        if full_output.startswith(input_text):
+            response = full_output[len(input_text):].strip()
+        else:
+            response = full_output.strip()
 
         return response
