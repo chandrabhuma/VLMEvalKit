@@ -1929,6 +1929,9 @@ sa2va_series = {
     'Sa2VA-Qwen2_5-VL-7B': partial(SA2VA, model_path='ByteDance/Sa2VA-Qwen2_5-VL-7B'),
     
 }
+kanana_series = {
+    'kanana-1.5-v-3b-instruct': partial(Kanana, model_path='kakaocorp/kanana-1.5-v-3b-instruct'),
+}
 keye_series = {
     "Keye-VL-1.5-8B-auto":partial(KeyeChat, model_path="Kwai-Keye/Keye-VL-1_5-8B"),
     "Keye-VL-1.5-8B-think":partial(KeyeChat, model_path="Kwai-Keye/Keye-VL-1_5-8B", think=True),
