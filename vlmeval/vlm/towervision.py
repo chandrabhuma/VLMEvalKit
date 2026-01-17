@@ -48,27 +48,20 @@ class TowerVision(BaseModel):
 
         image = Image.open(image_path).convert("RGB")
 
-        # ✅ Use chat template for correct prompt formatting
+        # ✅ CRITICAL: Build message with {"type": "image"} (no data)
         conversation = [
             {
                 "role": "user",
                 "content": [
-                    {"type": "image"},
+                    {"type": "image"},          # ← placeholder only
                     {"type": "text", "text": text_prompt},
                 ],
             }
         ]
 
-        # Apply chat template to get full prompt with roles and <image>
-        prompt = self.processor.apply_chat_template(
-            conversation,
-            add_generation_prompt=True,
-            tokenize=False
-        )
-
-        # Process
+        # ✅ Let processor handle prompt + image binding
         inputs = self.processor(
-            text=prompt,
+            conversation,
             images=image,
             return_tensors="pt"
         ).to(self.model.device)
@@ -82,15 +75,9 @@ class TowerVision(BaseModel):
                 temperature=0.0,
             )
 
-        # ✅ Decode full output and remove input part safely
-        full_output = self.processor.batch_decode(gen_tokens, skip_special_tokens=True)[0]
-
-        # Optional: strip input prompt if needed (usually not necessary with skip_special_tokens)
-        # But if you want to be sure:
-        input_text = self.processor.batch_decode(inputs.input_ids, skip_special_tokens=True)[0]
-        if full_output.startswith(input_text):
-            response = full_output[len(input_text):].strip()
-        else:
-            response = full_output.strip()
+        # Decode
+        response = self.processor.batch_decode(
+            gen_tokens, skip_special_tokens=True
+        )[0].strip()
 
         return response
