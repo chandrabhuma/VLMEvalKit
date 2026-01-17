@@ -1932,6 +1932,10 @@ sa2va_series = {
 kanana_series = {
     'kanana-1.5-v-3b-instruct': partial(Kanana, model_path='kakaocorp/kanana-1.5-v-3b-instruct'),
 }
+
+jina_series = {
+    'jina-vlm': partial(JinaVLM, model_path='jinaai/jina-vlm'),
+}
 keye_series = {
     "Keye-VL-1.5-8B-auto":partial(KeyeChat, model_path="Kwai-Keye/Keye-VL-1_5-8B"),
     "Keye-VL-1.5-8B-think":partial(KeyeChat, model_path="Kwai-Keye/Keye-VL-1_5-8B", think=True),
@@ -1982,7 +1986,7 @@ model_groups = [
     long_vita_series, ristretto_series, kimi_series, aguvis_series, hawkvl_series,
     flash_vl, kimi_vllm_series, oryx_series, treevgr_series, varco_vision_series, qtunevl_series, 
     xvl_series, thyme_series, logics_series, cosmos_series, keye_series, qianfanvl_series, 
-    lfm2vl_series, interns1_series, insight_v_series, ayavision_series, sa2va_series, kanana_series
+    lfm2vl_series, interns1_series, insight_v_series, ayavision_series, sa2va_series, kanana_series, jina_series
 ]
 
 for grp in model_groups:
