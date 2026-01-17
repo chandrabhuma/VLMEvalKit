@@ -1943,6 +1943,9 @@ towervision_series = {
 }
 oppoer_series = {
     'AndesVL-0_6B-Instruct': partial(AndesVL, model_path='OPPOer/AndesVL-0_6B-Instruct'),
+    'AndesVL-1B-Instruct': partial(AndesVL, model_path='OPPOer/AndesVL-1B-Instruct'),
+    'AndesVL-2B-Instruct': partial(AndesVL, model_path='OPPOer/AndesVL-2B-Instruct'),
+    'AndesVL-4B-Instruct': partial(AndesVL, model_path='OPPOer/AndesVL-4B-Instruct'),
 }
 keye_series = {
     "Keye-VL-1.5-8B-auto":partial(KeyeChat, model_path="Kwai-Keye/Keye-VL-1_5-8B"),
