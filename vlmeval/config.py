@@ -1982,7 +1982,7 @@ model_groups = [
     long_vita_series, ristretto_series, kimi_series, aguvis_series, hawkvl_series,
     flash_vl, kimi_vllm_series, oryx_series, treevgr_series, varco_vision_series, qtunevl_series, 
     xvl_series, thyme_series, logics_series, cosmos_series, keye_series, qianfanvl_series, 
-    lfm2vl_series, interns1_series, insight_v_series, ayavision_series, sa2va_series
+    lfm2vl_series, interns1_series, insight_v_series, ayavision_series, sa2va_series, kanana_series
 ]
 
 for grp in model_groups:
