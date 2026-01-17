@@ -8,7 +8,7 @@ from .base import BaseModel
 
 
 class TowerVision(BaseModel):
-    def __init__(self, model_path="utter-project/TowerVision-2B", **kwargs):
+    def __init__(self, model_path, **kwargs):
         super().__init__()
         self.model_path = model_path
 
