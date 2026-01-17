@@ -22,62 +22,77 @@ class TowerVision(BaseModel):
         self.model.eval()
 
     def generate_inner(self, message, dataset=None):
-        # Normalize input
-        if (
-            isinstance(message, list)
-            and len(message) == 2
-            and isinstance(message[0], str)
-            and isinstance(message[1], str)
-        ):
-            message = [
-                {"type": "image", "value": message[0]},
-                {"type": "text", "value": message[1]},
-            ]
-
-        image_path = None
-        text_prompt = ""
-
-        for item in message:
-            if item["type"] == "image":
-                image_path = item["value"]
-            elif item["type"] == "text":
-                text_prompt = item["value"]
-
-        if not image_path or not os.path.exists(image_path):
-            raise FileNotFoundError(f"Image not found: {image_path}")
-
-        image = Image.open(image_path).convert("RGB")
-
-        # ✅ CRITICAL: Build message with {"type": "image"} (no data)
-        conversation = [
-            {
-                "role": "user",
-                "content": [
-                    {"type": "image"},          # ← placeholder only
-                    {"type": "text", "text": text_prompt},
-                ],
-            }
+    # --------------------------------------------------
+    # 1. Normalize VLMEvalKit shorthand
+    # ['img.jpg', 'question']
+    # --------------------------------------------------
+    if (
+        isinstance(message, list)
+        and len(message) == 2
+        and isinstance(message[0], str)
+        and isinstance(message[1], str)
+    ):
+        message = [
+            {"type": "image", "value": message[0]},
+            {"type": "text", "value": message[1]},
         ]
 
-        # ✅ Let processor handle prompt + image binding
-        inputs = self.processor(
-            conversation,
-            images=image,
-            return_tensors="pt"
-        ).to(self.model.device)
+    image_path = None
+    query = ""
 
-        # Generate
-        with torch.no_grad():
-            gen_tokens = self.model.generate(
-                **inputs,
-                max_new_tokens=512,
-                do_sample=False,
-                temperature=0.0,
-            )
+    for item in message:
+        if item["type"] == "image":
+            image_path = item["value"]
+        elif item["type"] == "text":
+            query = item["value"]
 
-        # Decode
-        response = self.processor.batch_decode(
-            gen_tokens, skip_special_tokens=True
-        )[0].strip()
+    if not image_path or not os.path.exists(image_path):
+        raise FileNotFoundError(f"Image not found: {image_path}")
 
-        return response
+    image = Image.open(image_path).convert("RGB")
+
+    # --------------------------------------------------
+    # 2. Build TowerVision conversation (OFFICIAL FORMAT)
+    # --------------------------------------------------
+    conversation = [
+        {
+            "role": "user",
+            "content": f"<image>\n{query}"
+        }
+    ]
+
+    prompt = self.processor.apply_chat_template(
+        conversation,
+        tokenize=False,
+        add_generation_prompt=True
+    )
+
+    # --------------------------------------------------
+    # 3. Process inputs
+    # --------------------------------------------------
+    inputs = self.processor(
+        text=prompt,
+        images=image,
+        return_tensors="pt"
+    ).to(self.model.device)
+
+    # --------------------------------------------------
+    # 4. Generate
+    # --------------------------------------------------
+    with torch.no_grad():
+        gen_tokens = self.model.generate(
+            **inputs,
+            max_new_tokens=512,
+            do_sample=False,
+            temperature=0.0,
+        )
+
+    # --------------------------------------------------
+    # 5. Decode EXACTLY like repo
+    # --------------------------------------------------
+    response = self.processor.tokenizer.decode(
+        gen_tokens[0][inputs.input_ids.shape[1]:],
+        skip_special_tokens=True
+    ).strip()
+
+    return response
