@@ -1942,7 +1942,7 @@ towervision_series = {
     'TowerVision-9B': partial(TowerVision, model_path='utter-project/TowerVision-9B'),
 }
 lingshu_series = {
-    'Lingshu-7B': partial(Lingshu model_path='lingshu-medical-mllm/Lingshu-7B'),
+    'Lingshu-7B': partial(Lingshu, model_path='lingshu-medical-mllm/Lingshu-7B'),
 }
 oppoer_series = {
     'AndesVL-0_6B-Instruct': partial(AndesVL, model_path='OPPOer/AndesVL-0_6B-Instruct'),
