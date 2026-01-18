@@ -122,4 +122,5 @@ from .kanana import Kanana
 from .jina import JinaVLM
 from .towervision import TowerVision
 from .oppoer import AndesVL
+from .lingshu import  Lingshu
 
