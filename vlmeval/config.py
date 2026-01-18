@@ -1941,6 +1941,9 @@ towervision_series = {
     'TowerVision-2B': partial(TowerVision, model_path='utter-project/TowerVision-2B'),
     'TowerVision-9B': partial(TowerVision, model_path='utter-project/TowerVision-9B'),
 }
+lingshu_series = {
+    'Lingshu-7B': partial(Lingshu model_path='lingshu-medical-mllm/Lingshu-7B'),
+}
 oppoer_series = {
     'AndesVL-0_6B-Instruct': partial(AndesVL, model_path='OPPOer/AndesVL-0_6B-Instruct'),
     'AndesVL-1B-Instruct': partial(AndesVL, model_path='OPPOer/AndesVL-1B-Instruct'),
@@ -1997,7 +2000,8 @@ model_groups = [
     long_vita_series, ristretto_series, kimi_series, aguvis_series, hawkvl_series,
     flash_vl, kimi_vllm_series, oryx_series, treevgr_series, varco_vision_series, qtunevl_series, 
     xvl_series, thyme_series, logics_series, cosmos_series, keye_series, qianfanvl_series, 
-    lfm2vl_series, interns1_series, insight_v_series, ayavision_series, sa2va_series, kanana_series, jina_series, towervision_series, oppoer_series
+    lfm2vl_series, interns1_series, insight_v_series, ayavision_series, sa2va_series, kanana_series, jina_series, towervision_series, oppoer_series,
+    lingshu_series
 ]
 
 for grp in model_groups:
