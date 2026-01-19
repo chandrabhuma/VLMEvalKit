@@ -7,7 +7,7 @@ from vlmeval.smp import *
 from vlmeval.vlm.base import BaseModel
 
 class Hulu(BaseModel):
-    def __init__(self, model_path='ZJU-AI4H/Hulu-Med-4B', **kwargs):
+    def __init__(self, model_path, **kwargs):
         assert model_path is not None
         self.model_path = model_path
         self.processor = AutoProcessor.from_pretrained(
@@ -21,7 +21,7 @@ class Hulu(BaseModel):
             trust_remote_code=True,
             torch_dtype=torch.bfloat16,
             device_map='auto',
-            attn_implementation='flash_attention_2',
+            attn_implementation='eager',
         )
         self.model.eval()
         self.kwargs = kwargs
