@@ -1946,6 +1946,9 @@ lingshu_series = {
 }
 hulu_series = {
     'Hulu-Med-4B': partial(Hulu, model_path='ZJU-AI4H/Hulu-Med-4B'),
+    'Hulu-Med-7B': partial(Hulu, model_path='ZJU-AI4H/Hulu-Med-7B'),
+    'Hulu-Med-14B': partial(Hulu, model_path='ZJU-AI4H/Hulu-Med-14B'),
+    'Hulu-Med-32B': partial(Hulu, model_path='ZJU-AI4H/Hulu-Med-32B')
 }
 oppoer_series = {
     'AndesVL-0_6B-Instruct': partial(AndesVL, model_path='OPPOer/AndesVL-0_6B-Instruct'),
