@@ -1,4 +1,6 @@
 ![LOGO](http://opencompass.openxlab.space/utils/MMLB.jpg)
+![LOGO](https://github.com/chandrabhuma/VLMEvalKit/blob/main/Bapatla%20Enginering%20college%20Logo%20JPG.jpg)
+
 ****A Forked Repo Incorporating More Models and More Datasets****
 <b>A Toolkit for Evaluating Large Vision-Language Models. </b>
 
