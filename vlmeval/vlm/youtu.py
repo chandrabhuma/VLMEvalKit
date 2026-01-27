@@ -61,7 +61,7 @@ class YoutuVL(BaseModel):
                 top_p=0.001,
                 repetition_penalty=1.05,
                 do_sample=True,
-                max_new_tokens=512,  # Reduced from 32768 for evaluation efficiency
+                max_new_tokens=32768,  # Reduced from 32768 for evaluation efficiency
                 img_input=image_path,
                 **self.kwargs
             )
