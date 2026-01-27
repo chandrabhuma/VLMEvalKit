@@ -1944,9 +1944,7 @@ towervision_series = {
 lingshu_series = {
     'Lingshu-7B': partial(Lingshu, model_path='lingshu-medical-mllm/Lingshu-7B'),
 }
-mimo_series = {
-     'MiMo-VL-7B-RL': partial(MiMo, model_path='XiaomiMiMo/MiMo-VL-7B-RL'),
-}
+
 hulu_series = {
     'Hulu-Med-4B': partial(Hulu, model_path='ZJU-AI4H/Hulu-Med-4B'),
     'Hulu-Med-7B': partial(Hulu, model_path='ZJU-AI4H/Hulu-Med-7B'),
@@ -2016,7 +2014,7 @@ model_groups = [
     flash_vl, kimi_vllm_series, oryx_series, treevgr_series, varco_vision_series, qtunevl_series, 
     xvl_series, thyme_series, logics_series, cosmos_series, keye_series, qianfanvl_series, 
     lfm2vl_series, interns1_series, insight_v_series, ayavision_series, sa2va_series, kanana_series, jina_series, towervision_series, oppoer_series,
-    lingshu_series, hulu_series, vst_series, mimo_series
+    lingshu_series, hulu_series, vst_series
 ]
 
 for grp in model_groups:
