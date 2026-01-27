@@ -1958,6 +1958,9 @@ oppoer_series = {
 }
 vst_series = {
     'VST-3B-SFT': partial(VST, model_path='rayruiyang/VST-3B-SFT'),
+    'VST-3B-RL': partial(VST, model_path='rayruiyang/VST-3B-RL'),
+    'VST-7B-SFT': partial(VST, model_path='rayruiyang/VST-7B-SFT'),
+    'VST-7B-RL': partial(VST, model_path='rayruiyang/VST-7B-RL'),
 }
 keye_series = {
     "Keye-VL-1.5-8B-auto":partial(KeyeChat, model_path="Kwai-Keye/Keye-VL-1_5-8B"),
