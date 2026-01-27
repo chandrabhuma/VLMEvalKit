@@ -1,5 +1,8 @@
 ![LOGO](http://opencompass.openxlab.space/utils/MMLB.jpg)
-<img src="https://github.com/chandrabhuma/VLMEvalKit/blob/main/Bapatla%20Enginering%20college%20Logo%20JPG.jpg" alt="LOGO" width="200"/>
+<div align="center">
+  <img src="https://github.com/chandrabhuma/VLMEvalKit/blob/main/Bapatla%20Enginering%20college%20Logo%20JPG.jpg" alt="LOGO" width="200"/>
+</div>
+
 
 
 ****A Forked Repo Incorporating More Models and More Datasets****
