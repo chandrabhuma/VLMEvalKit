@@ -62,39 +62,4 @@ class MiMo(BaseModel):
         
         return response.strip()
     
-    def use_custom_prompt(self, dataset):
-        # Check if the dataset has a custom prompt defined
-        if dataset is not None and listinstr(['MCQ', 'Y/N'], dataset):
-            return True
-        return False
     
-    def build_prompt(self, line, dataset=None):
-        assert self.use_custom_prompt(dataset)
-        assert isinstance(line, dict)
-        
-        tgt_path = self.dump_image(line, dataset)
-        
-        question = line['question']
-        
-        if dataset is not None and 'MMMU' in dataset:
-            # For MMMU dataset, format accordingly
-            prompt = question
-        elif dataset is not None and listinstr(['MCQ'], dataset):
-            # For multiple choice questions
-            options = {
-                cand: line[cand]
-                for cand in string.ascii_uppercase
-                if cand in line and not pd.isna(line[cand])
-            }
-            options_prompt = '\n'.join([f'{key}. {value}' for key, value in options.items()])
-            prompt = f'{question}\n{options_prompt}'
-        elif dataset is not None and listinstr(['Y/N'], dataset):
-            # For yes/no questions
-            prompt = f'{question}'
-        else:
-            # Default case
-            prompt = question
-            
-        message = [dict(type='image', value=tgt_path)]
-        message.extend([dict(type='text', value=prompt)])
-        return message
