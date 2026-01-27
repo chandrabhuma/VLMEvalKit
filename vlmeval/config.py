@@ -1956,6 +1956,9 @@ oppoer_series = {
     'AndesVL-2B-Instruct': partial(AndesVL, model_path='OPPOer/AndesVL-2B-Instruct'),
     'AndesVL-4B-Instruct': partial(AndesVL, model_path='OPPOer/AndesVL-4B-Instruct'),
 }
+vst_series = {
+    'VST-3B-SFT': partial(VST, model_path='rayruiyang/VST-3B-SFT'),
+}
 keye_series = {
     "Keye-VL-1.5-8B-auto":partial(KeyeChat, model_path="Kwai-Keye/Keye-VL-1_5-8B"),
     "Keye-VL-1.5-8B-think":partial(KeyeChat, model_path="Kwai-Keye/Keye-VL-1_5-8B", think=True),
@@ -2007,7 +2010,7 @@ model_groups = [
     flash_vl, kimi_vllm_series, oryx_series, treevgr_series, varco_vision_series, qtunevl_series, 
     xvl_series, thyme_series, logics_series, cosmos_series, keye_series, qianfanvl_series, 
     lfm2vl_series, interns1_series, insight_v_series, ayavision_series, sa2va_series, kanana_series, jina_series, towervision_series, oppoer_series,
-    lingshu_series, hulu_series
+    lingshu_series, hulu_series, vst_series
 ]
 
 for grp in model_groups:
