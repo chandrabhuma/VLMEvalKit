@@ -1,7 +1,7 @@
 import torch
 from transformers import AutoProcessor, AutoModelForImageTextToText
 from vlmeval.smp import *
-from vlmeval.utils import CustomPrompt
+
 from vlmeval.vlm.base import BaseModel
 
 class MiMo(BaseModel):
