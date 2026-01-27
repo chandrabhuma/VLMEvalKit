@@ -8,7 +8,7 @@ from vlmeval.smp import *
 from vlmeval.vlm import BaseModel
 
 class VST(BaseModel):
-    def __init__(self, model_path='rayruiyang/VST-3B-SFT', **kwargs):
+    def __init__(self, model_path, **kwargs):
         super().__init__()
         self.model_path = model_path
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
