@@ -1936,6 +1936,9 @@ kanana_series = {
 jina_series = {
     'jina-vlm': partial(JinaVLM, model_path='jinaai/jina-vlm'),
 }
+youtu_series = {
+    'Youtu-VL-4B-Instruct': partial(YoutuVL, model_path='tencent/Youtu-VL-4B-Instruct'),
+}
 
 towervision_series = {   
     'TowerVision-2B': partial(TowerVision, model_path='utter-project/TowerVision-2B'),
@@ -2014,7 +2017,7 @@ model_groups = [
     flash_vl, kimi_vllm_series, oryx_series, treevgr_series, varco_vision_series, qtunevl_series, 
     xvl_series, thyme_series, logics_series, cosmos_series, keye_series, qianfanvl_series, 
     lfm2vl_series, interns1_series, insight_v_series, ayavision_series, sa2va_series, kanana_series, jina_series, towervision_series, oppoer_series,
-    lingshu_series, hulu_series, vst_series
+    lingshu_series, hulu_series, vst_series, youtu_series
 ]
 
 for grp in model_groups:
